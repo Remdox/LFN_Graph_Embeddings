@@ -1,11 +1,24 @@
 \documentclass{report}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{content/references.bib}
 
 \input{style}
 
 \begin{document}
 \input{content/title.tex}
+\pagenumbering{gobble}
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
 \input{content/motivation.tex}
+\newpage
 \input{content/datasets.tex}
+\newpage
 \input{content/methods.tex}
+\newpage
 \input{content/experiments.tex}
+\newpage
+\addcontentsline{toc}{section}{5\quad References}
+\printbibliography
 \end{document}
