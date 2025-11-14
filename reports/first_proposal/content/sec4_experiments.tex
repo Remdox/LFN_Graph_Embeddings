@@ -1,9 +1,10 @@
 \section{Experiments}
 To compare the embedding methods, we first make a sample of the edges of the graph and then partition it into training, validition, test sets.
-We then apply the embedding methods and use the models described in Sec\ref{sec:methods} to predict new links, and finally compare the predictions with the
-edges which are not included in the sample. We employ each model for all embeddings, so that we can compare the impact of each one of them on the prediction of each model. \\ \newline
-The implementations used are: \cite{} for  \\ \newline
-Hardware used: \\ \newline
+We then apply the embedding methods and use the models described in Sec \ref{sec:methods} to predict new links, and finally compare the predictions with the
+edges which are not included in the sample. We employ each model for all embeddings, so that we can compare the impact of each one of them on the prediction of each model. Finally, the metrics will be used to get relevant information about the quality of the embeddings. The results will be analyzed 
+to assess how each embedding scales and adapts with different categories and sizes. \\ \newline
+The implementations used are: \cite{Node2VecImpl} for Node2Vec, \cite{LINEImpl} for LINE, \cite{DVNEImpl} for DVNE, \cite{GraphSageImpl} for GraphSage. \\ \newline
+Hardware: Colab is used. Specifics of its basic runtime: Intel(R) Xeon(R) CPU 2-core @ 2.20GHz, 13 Gb, 110 Gb disk, Nvidia Tesla T4 (16 Gb VRAM) \\ \newline
 To evaluate the methods used in this project, two different evaluation measures will be used: the Area Under the Receiver Operating 
 Characteristic curve (AUROC), and the Area Under the Precision-Recall curve (AUPR).
 AUROC is historically considered the primary performance metric used to evaluate the performances of Link Prediction methods \cite{Kalyani2025}. 
@@ -11,5 +12,3 @@ However, AUROC favors accurate classification of positive examples, at the cost 
 In a scenario like Link Prediction problem, which is inherently skewed towards the negative class, it may not be suitable and can 
 overestimate the performance of the methods. 
 For this reason, the AUPR curve was also selected, as it can provide better evaluation of Link Prediction in the presence of class imbalance. \\ \newline
-Finally, the metrics will be used to get relevant information about the quality of the embeddings. The results will be analyzed 
-to assess how each embedding scales and adapts with different categories and sizes.
