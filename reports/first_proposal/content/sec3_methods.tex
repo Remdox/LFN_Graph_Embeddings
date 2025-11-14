@@ -5,7 +5,7 @@ In order to achieve this, a similarity score \(S(u, v)\) is computed between pai
 \(DEC: \mathbb{R}^d \times \mathbb{R}^d \to \mathbb{R}\) is used for computing a similarity score for the embeddings. The discrepancy between the two scores is then compared and minimized 
 by means of a loss function, such as the empirical loss:
 \[ \mathcal{L} = \sum_{i,j} \ell(DEC(\mathbf{z}_u, \mathbf{z}_v), S(u, v)) \]
-Based on this context, the specifics of which encoder and decoder is used is what really differentiates the node embedding methods. 
+The node embedding methods are defined by the characteristics of the encoder and decoder.
 In this project, four of these methods will be employed:
 \begin{itemize}
     \item Node2Vec \cite{node2vec}, a shallow encoding method and essentially a tunable version of the DeepWalk algorithm, which is often used in the scientific literature as the baseline for comparing node embedding methods;
@@ -15,8 +15,8 @@ In this project, four of these methods will be employed:
           can be measured using the Wasserstein distance;
     \item GraphSage \cite{GraphSage}, a deep encoding method making use of a GNN that aggregates the features of each node's neighborhood and learns to generate node embeddings from that.
 \end{itemize}
-Given the node embeddings, we use them as input to ML models to make predictions, depending on the task to solve.
-For this project the main task is link prediction, where the goal is to predict the existence of a link between two nodes in a network.
+Given the node embeddings, they are used as input to machine learning models to make predictions, depending on the task to be solved.
+For this project the main task is link prediction, which aims to predict the existence of a link between two nodes in a network.
 Since the quality of the embeddings could depend on the model used, we'll try models of different complexity: Support Vector Machines \cite{SVM}, 
 where eventually the kernel trick could be used to handle non-linear relations between embeddings; Random Forest \cite{RandomForest}, 
 for its really fast computation; Multilayer Perceptron \cite{MLP}, for accurate predictions.
