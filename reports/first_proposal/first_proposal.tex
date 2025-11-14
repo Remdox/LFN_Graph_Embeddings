@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass{article}
 \usepackage[backend=biber,style=numeric, sorting=none]{biblatex}
 \usepackage{bm}
 \usepackage{graphicx}
@@ -21,8 +21,9 @@
 \input{content/sec2_datasets.tex}
 \input{content/sec3_methods.tex}
 \input{content/sec4_experiments.tex}
-\section*{5\quad References}
-\addcontentsline{toc}{section}{5\quad References}
-\printbibliography[heading=none]
+%\section{5\quad References}
+\addcontentsline{toc}{section}{ References}
+\printbibliography%[heading=none]
+\newpage
 \input{content/sec6_contribution_and_AIusage.tex}
 \end{document}
