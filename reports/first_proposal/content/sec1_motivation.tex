@@ -1,2 +1,21 @@
 \section*{1\quad  Motivation}
 \addcontentsline{toc}{section}{1\quad Motivation}
+
+Graphs have emerged as a natural model for the representation and analysis of data and complex systems in various domains. 
+For instance, link prediction in social networks can help to understand the spreading process of rumors or epidemics \cite{pastor2015epidemic}, and in biological networks, it is commonly used for predicting novel interactions between proteins \cite{junker2008analysis}.
+
+However, most traditional machine learning algorithms are not designed to work directly with graph-structured data, as they require numeric vectors or matrices as inputs.
+To address this challenge, graph embedding techniques have been developed to learn low-dimensional vector representations of nodes, edges, or entire graphs while preserving their topological properties.
+
+Consequently, in order to design an effective graph embedding technique, it is necessary to consider several criteria \cite{baptista2023zoo}. 
+Two of these are adaptability and scalability.
+An embedding is considered adaptable if it can be utilized for various data and tasks without the need for retraining.
+The scalability of an embedding is determined by its capacity to process large-scale networks within a reasonable amount of time.
+
+The objective of this study is to evaluate known embeddings from the perspective of these two criteria.
+
+From the perspective of adaptability, the objective is to determine the potential impact of the graph domain on the precision of an embedding.
+In other words, the objective is to ascertain whether there exist approaches that are better suited for a particular field, whether there is one embedding that consistently outperforms the others, or if the embeddings are comparable.
+Eventually, we would like to assess the adaptability of these embeddings when they are applied to different tasks.
+
+In the context of scalability, the objective is to identify the embeddings that are better suited to process large graphs. The objective of this study is to evaluate the tradeoff between the accuracy of the predictions and the time required for training and inference.
