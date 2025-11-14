@@ -8,20 +8,20 @@ In order to achieve this, a similarity score \(S(u, v)\) is computed between pai
 by means of a loss function, such as the empirical loss:
 \[ \mathcal{L} = \sum_{i,j} \ell(DEC(\mathbf{z}_u, \mathbf{z}_v), S(u, v)) \]
 Based on this context, the specifics of which encoder and decoder is used is what really differentiates the node embedding methods. 
-In this project, four node embedding methods will be employed:
+In this project, four of these methods will be employed:
 \begin{itemize}
-    \item Node2Vec, a shallow encoding which is a tunable version of the DeepWalk algorithm, which is often used in the scientific literature as the baseline for comparing node embedding methods.
-    \item LINE, a shallow encoding which is am highly-scalable approximation algorithm.
-    \item Deep Variational Network Embedding in Wasserstein Space, a deep encoding method using a Variational Autoencoder. This metod has a particular approach of
+    \item Node2Vec \cite{node2vec}, a shallow encoding which is a tunable version of the DeepWalk algorithm, which is often used in the scientific literature as the baseline for comparing node embedding methods.
+    \item LINE \cite{LINE}, a shallow encoding which is am highly-scalable approximation algorithm.
+    \item Deep Variational Network Embedding in Wasserstein Space \cite{DVNE}, a deep encoding method using a Variational Autoencoder. This metod has a particular approach of
           encoding each node to a probability distribution, so in this case the similarity score between embeddings is a distance between probability distributions, which
           can be measured using the Wasserstein distance.
-    \item GraphSage, a deep encoding method making use of a GNN that aggregates the features of each node's neighborhood and learns to generate node embeddings from that.
+    \item GraphSage \cite{GraphSage}, a deep encoding method making use of a GNN that aggregates the features of each node's neighborhood and learns to generate node embeddings from that.
 \end{itemize}
-Given the graph embeddings, we use them as input to ML models to make predictions, depending on the task to solve.
-In the case of this project and the datasets used, the main task is link prediction. Link prediction is the problem of predicting a link between two nodes in a network.
-The models that will be used for solving the task are:
+Given the node embeddings, we use them as input to ML models to make predictions, depending on the task to solve.
+For this project the main task is link prediction, where the goal is to predict the existence of a link between two nodes in a network.
+Since the quality of the embeddings could depend on the model used, we'll try models of different complexity:
 \begin{itemize}
-    \item Support Vector Machines
-    \item Random Forest
-    \item Multilayer Perceptron
+    \item Support Vector Machines \cite{SVM}, where eventually the kernel trick could be used to handle non-linear relations between embeddings;
+    \item Random Forest \cite{RandomForest}, for its really fast computation;
+    \item Multilayer Perceptron \cite{MLP}, for accurate predictions.
 \end{itemize}
