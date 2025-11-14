@@ -1,2 +1,9 @@
 \section*{4\quad Experiments}
 \addcontentsline{toc}{section}{4\quad Experiments}
+To evaluate the methods used in this project, two different evaluation measures will be used: the Area Under the Receiver Operating 
+Characteristic curve (AUROC), and the Area Under the Precision-Recall curve (AUPR).
+AUROC is historically considered the primary performance metric used to evaluate the performances of Link Prediction methods \cite{Kalyani2025}. 
+However, AUROC favors accurate classification of positive examples, at the cost of misclassifying the negative ones.
+In a scenario like Link Prediction problem, which is inherently skewed towards the negative class, it may not be suitable and can 
+overestimate the performance of the methods. 
+For this reason, the AUPR curve was also selected, as it can provide better evaluation of Link Prediction in the presence of class imbalance.

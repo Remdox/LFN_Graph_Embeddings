@@ -1,5 +1,9 @@
 \documentclass{report}
 \usepackage[backend=biber,style=numeric]{biblatex}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{hyperref}
 \addbibresource{content/references.bib}
 
 \input{style}
@@ -12,15 +16,11 @@
 \pagenumbering{arabic}
 \setcounter{page}{1}
 \input{content/sec1_motivation.tex}
-\newpage
 \input{content/sec2_datasets.tex}
-\newpage
 \input{content/sec3_methods.tex}
-\newpage
 \input{content/sec4_experiments.tex}
-\newpage
+\section*{5\quad References}
 \addcontentsline{toc}{section}{5\quad References}
-\printbibliography
-\newpage
+\printbibliography[heading=none]
 \input{content/sec6_contribution_and_AIusage.tex}
 \end{document}
