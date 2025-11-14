@@ -1,6 +1,5 @@
 \section*{3\quad  Methods}
 \addcontentsline{toc}{section}{3\quad Methods}
-
 Node embedding is the task of mapping nodes into an embedding space, where each node \(v\) is represented by a vector \(\mathbf{z_v} \in \mathbb{R}^d\) using the mapping function \(ENC: v \to \mathbf{z}_v\).
 The encoding of nodes into embeddings has to be such that similarity between each pair of nodes is kept in the correspondent embeddings. 
 In order to achieve this, a similarity score \(S(u, v)\) is computed between pairwise nodes and a decoder function 
@@ -10,11 +9,11 @@ by means of a loss function, such as the empirical loss:
 Based on this context, the specifics of which encoder and decoder is used is what really differentiates the node embedding methods. 
 In this project, four of these methods will be employed:
 \begin{itemize}
-    \item Node2Vec \cite{node2vec}, a shallow encoding which is a tunable version of the DeepWalk algorithm, which is often used in the scientific literature as the baseline for comparing node embedding methods.
-    \item LINE \cite{LINE}, a shallow encoding which is am highly-scalable approximation algorithm.
+    \item Node2Vec \cite{node2vec}, a shallow encoding method and essentially a tunable version of the DeepWalk algorithm, which is often used in the scientific literature as the baseline for comparing node embedding methods;
+    \item LINE \cite{LINE}, a shallow encoding which is an highly-scalable approximation algorithm;
     \item Deep Variational Network Embedding in Wasserstein Space \cite{DVNE}, a deep encoding method using a Variational Autoencoder. This metod has a particular approach of
           encoding each node to a probability distribution, so in this case the similarity score between embeddings is a distance between probability distributions, which
-          can be measured using the Wasserstein distance.
+          can be measured using the Wasserstein distance;
     \item GraphSage \cite{GraphSage}, a deep encoding method making use of a GNN that aggregates the features of each node's neighborhood and learns to generate node embeddings from that.
 \end{itemize}
 Given the node embeddings, we use them as input to ML models to make predictions, depending on the task to solve.
