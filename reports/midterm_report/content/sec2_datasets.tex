@@ -1,0 +1,16 @@
+\section{Dataset preprocessing}
+
+Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to the Pennsylvania dataset in the proposal.
+The dataset from \cite{snapnets} has been used instead.
+The decision to change the dataset was made to have a directed graph, instead of an undirected one, so to have more uniformity among road networks.
+The main properties of the new dataset are the following: $|V| = 1088092, |E| = 3083796$, and Directed.\\\newline
+All of the datasets utilized in this study were subjected to a unification of format through a preprocessing procedure.
+The datasets were in various file formats and contained different types of information.
+Initially, all the datasets were manually converted to CSV files.
+Subsequently, a Python script was implemented to automate the preprocessing of the datasets.
+To ensure a uniform data structure, all datasets were converted into CSV files comprising three columns: \texttt{u}, \texttt{v}, and \texttt{weight}.
+The columns \texttt{u} and \texttt{v} represent the source and target nodes of an edge, respectively.
+In the case of an undirected dataset, each edge between two vertices, denoted by $(u, v)$, is represented by two directed edges, namely $(u, v)$ and $(v, u)$.
+The column \texttt{weight} represents the weight of the edge.
+In the case of an unweighted dataset, a uniform weight of 1.0 was assigned to all edges.
+Finally, if the node identifications were not numeric, they were mapped to numeric consecutive IDs starting from 0.
