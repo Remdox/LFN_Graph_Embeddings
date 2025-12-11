@@ -1,0 +1,10 @@
+name,u,v,weight,directed,node_info
+Pennsylvania,FromNodeId,ToNodeId,,True,
+Padua,u,v,length,True,(osmid;y;x;highway;street_count;ref;railway;junction)
+Hong_Kong,u,v,Distance(u,v),True,(latitude;longitude)
+Italian_Covid_19_Retweet_Network,from,to,weight,True,
+Twitch_Gamers,numeric_id_1,numeric_id_2,,False,(views;mature;life_time;created_at;updated_at;numeric_id;dead_account;language;affiliate)
+GitHub_Developers,id_1,id_2,,False,(json)
+Mus_Musculus_Protein_Interactions,protein1,protein2,combined_score,False,(string_protein_id;preferred_name;protein_size;annotation)
+Saccharomyces_cerevisiae_Protein_Interactions,protein1,protein2,combined_score,False,(string_protein_id;preferred_name;protein_size;annotation)
+Bio_grid_fission_yeast,u,v,,False,
