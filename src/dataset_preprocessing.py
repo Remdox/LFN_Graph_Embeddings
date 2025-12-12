@@ -1,4 +1,5 @@
 import csv
+import os
 
 # Parses a CSV file and returns its content as a list of dictionaries
 #
@@ -75,6 +76,10 @@ def dataset_preprocessing() -> None:
     # Load dataset information
     datasets = parser('./datasets/datasets_info.csv')
 
+    # Create processed_datasets directory if it doesn't exist
+    if not os.path.exists("./datasets/processed_datasets/"):
+        os.mkdir("./datasets/processed_datasets/")
+
     for dataset in datasets:
 
         name = dataset['name']
@@ -107,6 +112,7 @@ def dataset_preprocessing() -> None:
             if dataset['directed'] == 'False':
                 edges.append([int(row[dataset['v']]), int(row[dataset['u']]), edges[-1][2]])
 
+        # Create processed dataset CSV
         create_dataset_csv(dataset['name'], edges)
 
 
@@ -131,5 +137,5 @@ def get_datasets() -> dict:
 
     return datasets
 
-#dataset_preprocessing()
+dataset_preprocessing()
 #datasets = get_datasets()
