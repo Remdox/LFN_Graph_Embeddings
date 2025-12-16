@@ -1,18 +1,42 @@
-\section{Dataset preprocessing}
-
-Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to the Pennsylvania dataset and the Twitch dataset in the proposal.
-The dataset from \cite{Leskovec2009Community} has been used instead of the Pennsylvania dataset from the proposal.
-The decision to change the dataset was made to have a directed graph, instead of an undirected one, so to have more uniformity among road networks.
-The main properties of the new dataset are the following: $|V| = 1,088,092, |E| = 3,083,796$, and Directed.\\
-The Twicth dataset was replaced with the Deezer dataset from \cite{rozemberczki2019gemsec}. This was necessary due to the large number of edges of Twitch dataset, revealed unfeasible from the initial experiments.
-The Deezer dataset has the following properties: $|V| = 143,884, |E| = 846,915$, and Undirected. \\\newline
-All of the datasets utilized in this study were subjected to a unification of format through a preprocessing procedure.
-The datasets were in various file formats and contained different types of information.
-Initially, all the datasets were manually converted to CSV files.
-Subsequently, a Python script was implemented to automate the preprocessing of the datasets.
-To ensure a uniform data structure, all datasets were converted into CSV files comprising three columns: \texttt{u}, \texttt{v}, and \texttt{weight}.
-The columns \texttt{u} and \texttt{v} represent the source and target nodes of an edge, respectively.
-In the case of an undirected dataset, each edge between two vertices, denoted by $(u, v)$, is represented by two directed edges, namely $(u, v)$ and $(v, u)$.
-The column \texttt{weight} represents the weight of the edge.
-In the case of an unweighted dataset, a uniform weight of 1.0 was assigned to all edges.
-Finally, if the node identifications were not numeric, they were mapped to numeric consecutive IDs starting from 0.
+\section{Datasets}
+Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to the Pennsylvania dataset in the proposal.
+The dataset from \cite{snapnets} has been used instead.
+The decision to change the dataset was made to have a directed graph, instead of an undirected one, so to have more uniformity among road networks. \\\newline
+Due to concerns about the large number of edges of the Twitch dataset during the first experiments, it has been replaced with a smaller Deezer dataset from \cite{Deezer}. \\\newline
+We also want to provide more information about the two "Mus Musculus" and "Saccharomyces cerevisiae" datasets. Both of them have been downloaded
+from the STRING Database \cite{STRING}, filtered with the following options: $>0.4$ confidence score for Mus Musculus, $>0.7$ for Saccharomyces cerevisiae; only AB pairs (undirected). \\\newline
+What follows is the complete updated table (changes highlighted):
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textbf{\scalebox{0.87}{\large{Network}}} & \scalebox{0.87}{\large$\bm{|V|}$} & \scalebox{0.87}{\large$\bm{|E|}$} & \textbf{\scalebox{0.87}{\large{Type}}} \\
+        \hline
+        Pennsylvania \cite{Pennsylvania} & \textcolor{red}{1,088,092} & \textcolor{red}{3,083,796} & \textcolor{red}{Directed} \\
+        \hline
+        Padua (province) \cite{padua2025} & 122,680 & 304,184 & Directed \\
+        \hline
+        Hong Kong (city) \cite{hongkong2025} & 43,620 & 91,542 & Directed \\
+        \hline
+        Italian Covid-19 Retweet Network \cite{mesina2024italian} & 221,574 & 800,000 & Directed \\
+        \hline
+        \textcolor{red}{Deezer} \cite{Deezer} & \textcolor{red}{143,884} & \textcolor{red}{846,915} & Undirected \\
+        \hline
+        GitHub Developers \cite{rozemberczki2019multiscale} & 37,700 & 289,003 & Undirected \\
+        \hline
+        Mus Musculus Protein Interactions \cite{STRING} & 20,969 & 800,000 & Undirected \\
+        \hline
+        Saccharomyces cerevisiae Protein Interactions \cite{STRING} & 5,786 & 100,000 & Undirected \\
+        \hline
+        Bio-grid-fission-yeast \cite{nr} & 2,000 & 25,300 & Undirected \\
+        \hline
+    \end{tabular}
+    \caption{Datasets used in the project}
+    \label{tab:datasets}
+\end{table}
+\\
+A preprocessing pipeline is employed where all datasets are converted into CSV files and only useful features 
+are kept, if present. Undirected edges $(u, v)$ are represented using a pair of directed edges $(u, v)$ and $(v, u)$.
+Unweighted datasets are represented as having a uniform weight of 1.0 for all edges. Finally, if the node IDs are not numeric, they 
+are mapped to numeric consecutive IDs starting from 0. The Python script that performs this preprocessing step is available
+in the project's Github repository.
