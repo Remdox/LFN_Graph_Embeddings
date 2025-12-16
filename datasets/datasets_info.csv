@@ -8,3 +8,4 @@ GitHub_Developers,id_1,id_2,,False,(json)
 Mus_Musculus_Protein_Interactions,protein1,protein2,combined_score,False,(string_protein_id;preferred_name;protein_size;annotation)
 Saccharomyces_cerevisiae_Protein_Interactions,protein1,protein2,combined_score,False,(string_protein_id;preferred_name;protein_size;annotation)
 Bio_grid_fission_yeast,u,v,,False,
+Deezer,node_1,node_2,,False,

@@ -1,9 +1,11 @@
 \section{Dataset preprocessing}
 
-Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to the Pennsylvania dataset in the proposal.
-The dataset from \cite{snapnets} has been used instead.
+Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to the Pennsylvania dataset and the Twitch dataset in the proposal.
+The dataset from \cite{Leskovec2009Community} has been used instead of the Pennsylvania dataset from the proposal.
 The decision to change the dataset was made to have a directed graph, instead of an undirected one, so to have more uniformity among road networks.
-The main properties of the new dataset are the following: $|V| = 1088092, |E| = 3083796$, and Directed.\\\newline
+The main properties of the new dataset are the following: $|V| = 1,088,092, |E| = 3,083,796$, and Directed.\\
+The Twicth dataset was replaced with the Deezer dataset from \cite{rozemberczki2019gemsec}. This was necessary due to the large number of edges of Twitch dataset, revealed unfeasible from the initial experiments.
+The Deezer dataset has the following properties: $|V| = 143,884, |E| = 846,915$, and Undirected. \\\newline
 All of the datasets utilized in this study were subjected to a unification of format through a preprocessing procedure.
 The datasets were in various file formats and contained different types of information.
 Initially, all the datasets were manually converted to CSV files.
