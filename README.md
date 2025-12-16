@@ -21,7 +21,7 @@ Table of Contents
 
 # Introduction
 [Read the full proposal](./reports/first_proposal/first_proposal.pdf).  
-[Read the midterm report](./reports/first_proposal.pdf).
+[Read the midterm report](./reports/midterm_report.pdf).
    
 # Instructions
 ## Requirements
@@ -48,6 +48,20 @@ You can run the [setup file](./setup.py) in a venv environment for automatic ins
 # Datasets and project structure
 9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the fulll details and references for each dataset in the [proposal](./reports/first_proposal/first_proposal.pdf).
 
+## Datasets full details
+
+| Network | Nodes | Edges | Type | Link to the dataset page
+| :--- | :--- | :--- | :--- | :--- | 
+| **Pennsylvania** | 1,088,092 | 3,083,796 | Directed | http://snap.stanford.edu/data/roadNet-PA.html |
+| **Padua** (province) | 122,680 | 304,184 | Directed | https://github.com/Remdox/Padua_Network_dataset_2025 |
+| **Hong Kong** (city) | 43,620 | 91,542 | Directed | https://github.com/yzengal/RoadNetwork-China-City/blob/main/Hongkong.road-d.tar.gz |
+| **Italian Covid-19 Retweet Network** | 221,574 | 800,000 | Directed | https://zenodo.org/records/13909011 |
+| **Deezer** | 143,884 | 846,915 | Undirected | https://snap.stanford.edu/data/gemsec-Deezer.html |
+| **GitHub Developers** | 37,700 | 289,003 | Undirected | http://snap.stanford.edu/data/github-social.html |
+| **Mus Musculus** Protein Interactions (confidence score >0.7, only AB) | 20,969 | 800,000 | Undirected | https://string-db.org/cgi/download?sessionId=b9zuGHnAZu39&species_text=Mus+musculus&settings_expanded=1&min_download_score=400&filter_redundant_pairs=1&delimiter_type=csv |
+| **Saccharomyces cerevisiae** Protein Interactions (confidence score >0.4, only AB) | 5,786 | 100,000 | Undirected | https://string-db.org/cgi/download?sessionId=b9zuGHnAZu39&species_text=Saccharomyces+cerevisiae&settings_expanded=1&min_download_score=700&filter_redundant_pairs=1&delimiter_type=csv |
+| **Bio-grid-fission-yeast** | 2,000 | 25,300 | Undirected | https://networkrepository.com/bio-grid-fission-yeast.php |
+---
 ## Project Structure
 The dataset structure is defined as:
 ```
