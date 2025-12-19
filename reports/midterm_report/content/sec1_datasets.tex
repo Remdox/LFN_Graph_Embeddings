@@ -1,0 +1,45 @@
+\section{Datasets}
+Before proceeding to a discussion of the preprocessing of the datasets, it is necessary to inform readers that changes have been made to two of the datasets originally proposed.\\\newline
+The first change refers to the Pennsylvania dataset.
+The decision was made to replace the original Pennsylvania road network dataset with the corresponding dataset from \cite{Pennsylvania}.
+The decision to replace the undirected dataset with a directed one was made to ensure greater uniformity among road networks.\\\newline
+The second change refers to the Twitch dataset.
+Due to concerns regarding the large number of edges in the original dataset during the initial experimental phase, it has been replaced with a smaller Deezer dataset from \cite{Deezer}. \\\newline
+Furthermore, the two "Mus Musculus" and "Saccharomyces cerevisiae" datasets are described in greater detail as follows.
+Both of them have been downloaded from the STRING Database \cite{STRING}, filtered with the following options: a confidence score of $>0.4$ for Mus Musculus and $>0.7$ for Saccharomyces cerevisiae; and only AB pairs (undirected). \\\newline
+The subsequent table has been revised to reflect the aforementioned modifications. These alterations can be discerned within the table itself, as they are highlighted.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textbf{\scalebox{0.87}{\large{Network}}} & \scalebox{0.87}{\large$\bm{|V|}$} & \scalebox{0.87}{\large$\bm{|E|}$} & \textbf{\scalebox{0.87}{\large{Type}}} \\
+        \hline
+        Pennsylvania \cite{PennsylvaniaSource,Pennsylvania} & \textcolor{red}{1,088,092} & \textcolor{red}{3,083,796} & \textcolor{red}{Directed} \\
+        \hline
+        Padua (province) \cite{padua2025} & 122,680 & 304,184 & Directed \\
+        \hline
+        Hong Kong (city) \cite{hongkong2025} & 43,620 & 91,542 & Directed \\
+        \hline
+        Italian Covid-19 Retweet Network \cite{mesina2024italian} & 221,574 & 800,000 & Directed \\
+        \hline
+        \textcolor{red}{Deezer} \cite{DeezerSource,Deezer} & \textcolor{red}{143,884} & \textcolor{red}{846,915} & Undirected \\
+        \hline
+        GitHub Developers \cite{GitHubSource,GitHub} & 37,700 & 289,003 & Undirected \\
+        \hline
+        Mus Musculus Protein Interactions \cite{STRING} & 20,969 & 800,000 & Undirected \\
+        \hline
+        Saccharomyces cerevisiae Protein Interactions \cite{STRING} & 5,786 & 100,000 & Undirected \\
+        \hline
+        Bio-grid-fission-yeast \cite{nr} & 2,000 & 25,300 & Undirected \\
+        \hline
+    \end{tabular}
+    \caption{Datasets used in the project}
+    \label{tab:datasets}
+\end{table}
+\\
+A preprocessing pipeline is utilized in which all datasets are converted into CSV files and only the useful features are extracted, if present.\\\newline
+Initially, all the datasets were manually converted to CSV files, as some of them were not directly available in this format.
+Subsequently, a Python script was implemented to automate the following preprocessing of the datasets.
+Undirected edges $(u, v)$ are represented using a pair of directed edges $(u, v)$ and $(v, u)$.
+Unweighted datasets are represented as having a uniform weight of $1.0$ for all edges. 
+Finally, the node IDs are mapped to numeric consecutive IDs, with the sequence beginning at $0$. 
