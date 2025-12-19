@@ -1,4 +1,4 @@
-# LFN Graph Embeddings
+# LFN Graph Embeddings (project APEROL)
 LFN project, 2025.
 
 Table of Contents
@@ -46,7 +46,7 @@ You can run the [setup file](./setup.py) in a venv environment for automatic ins
     ```
    
 # Datasets and project structure
-9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the fulll details and references for each dataset in the [proposal](./reports/first_proposal/first_proposal.pdf).
+9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the references for each dataset in the [midterm report](./reports/midterm_report.pdf).
 
 ## Datasets full details
 
@@ -63,7 +63,7 @@ You can run the [setup file](./setup.py) in a venv environment for automatic ins
 | **Bio-grid-fission-yeast** | 2,000 | 25,300 | Undirected | https://networkrepository.com/bio-grid-fission-yeast.php |
 ---
 ## Project Structure
-The dataset structure is defined as:
+The project structure is defined as:
 ```
 LFN_Graph_Embeddings/
 ├── datasets/
