@@ -60,4 +60,4 @@ def get_datasets() -> dict[str, tuple[Data, bool, bool]]:
 if __name__ == "__main__":
     datasets = get_datasets()
     for name, (graph, directed, weighted) in datasets.items():
-        print(f'Dataset: {name}, Directed: {directed}, Weighted: {weighted}, Num nodes: {graph.num_nodes}, Num edges: {graph.num_edges}')
+        print(f'Dataset: {name}, Directed: {directed}, Weighted: {weighted}, Num nodes: {graph.num_nodes}, Num edges: {int(graph.num_edges / (2 if not directed else 1))}')
