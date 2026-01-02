@@ -39,16 +39,17 @@ def node_id_mapping(rows:list[dict], u_key:str, v_key:str) -> list[dict]:
     Returns:
     - Updated list of dictionaries with integer node IDs.
     """
-
-
+    next_id = 0
     node_ids = dict()
     for row in rows:
         u_val = row[u_key]
         v_val = row[v_key]
         if u_val not in node_ids:
-            node_ids[u_val] = next_id; next_id += 1
+            node_ids[u_val] = next_id
+            next_id += 1
         if v_val not in node_ids:
-            node_ids[v_val] = next_id; next_id += 1
+            node_ids[v_val] = next_id
+            next_id += 1
         row[u_key] = node_ids[u_val]
         row[v_key] = node_ids[v_val]
 
