@@ -40,18 +40,17 @@ def node_id_mapping(rows:list[dict], u_key:str, v_key:str) -> list[dict]:
     - Updated list of dictionaries with integer node IDs.
     """
 
-    node_ids = set()
+
+    node_ids = dict()
+    for row in rows:
+        for k in (u_key, v_key):
+            val = row[k]
+            if val not in node_ids:
+                node_ids[val] = len(node_ids)
 
     for row in rows:
-        node_ids.add(row[u_key])
-        node_ids.add(row[v_key])
-
-    node_ids = list(node_ids)
-    id_mapping = {old_id: str(node_ids.index(old_id)) for old_id in node_ids}
-
-    for row in rows:
-        row[u_key] = id_mapping[row[u_key]]
-        row[v_key] = id_mapping[row[v_key]]
+        row[u_key] = node_ids[row[u_key]]
+        row[v_key] = node_ids[row[v_key]]
 
     return rows
 
@@ -71,7 +70,6 @@ def dataset_preprocessing() -> None:
                                           weight - eventual numeric weight of the edge, 
                                           directed - if the graph is directed or not
     - The datasets to process are stored in ./datasets/original_datasets/
-    - If the dataset starts with node 0, node ID mapping is not applied.
     """
 
     # Load dataset information
@@ -91,11 +89,7 @@ def dataset_preprocessing() -> None:
         rows = parser(dataset_path)
 
         # Map node IDs to integers starting from 0
-        try:
-            if int(rows[0][dataset['u']]) > 0:
-                rows = node_id_mapping(rows, dataset['u'], dataset['v'])
-        except ValueError:
-            rows = node_id_mapping(rows, dataset['u'], dataset['v'])
+        rows = node_id_mapping(rows, dataset['u'], dataset['v'])
 
         edges = list()
 
