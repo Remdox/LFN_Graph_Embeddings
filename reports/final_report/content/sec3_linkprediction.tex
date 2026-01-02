@@ -1,0 +1,15 @@
+\section{Link Prediction}
+In this study, the main task considered is link prediction.
+The link prediction task is defined as the estimation of the existence of a link between two nodes in a network, based on the observed links.
+Formally, given a graph \(G=(V,E)\), where \(V\) is the set of nodes and \(E\) the set of edges, the link prediction task aims to predict whether an edge \((u,v) \in (V \times V) \setminus E\) exists or not, based on the observed edges in \(E\).
+\\\newline
+In order to perform link prediction using node embeddings, a common approach is to compute a feature vector for each pair of nodes \((u,v)\) based on their embeddings \(\mathbf{z}_u\) and \(\mathbf{z}_v\).
+Subsequently, the feature vectors are utilized as input to a binary classifier that predicts the presence or absence of a link between the two nodes. 
+\\\newline
+It is important to note that the quality of the predictions is potentially dependent on two factors: the embeddings themselves and the classifier utilized. 
+To this end, classifiers of varying complexity have been considered:
+\begin{itemize}
+    \item Support Vector Machines \cite{SVM}, where eventually the kernel trick could be used to handle non-linear relations between embeddings; 
+    \item Random Forest \cite{RandomForest}, for its really fast computation; 
+    \item Multilayer Perceptron \cite{MLP}, for accurate predictions.
+\end{itemize}

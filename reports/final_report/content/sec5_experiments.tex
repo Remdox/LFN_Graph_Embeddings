@@ -1,0 +1,35 @@
+\section{Experiments}
+The link prediction task requires a sample of edges from the graph (positive edges) and a sample of edges from the complement graph (negative edges, in this case, do not include self-loops). 
+Consequently, each dataset will be partitioned as follows.
+Consider graph $G=(V, E)$, where $V$ denotes the set of vertices and $E$ is the set of edges.
+A first split of the set of edges $E$ is needed for the embedding algorithms, creating $E_{\text{embed}}$ and $E_{\text{pred}}$.
+$E_{\text{embed}}$ is used for the subgraph $G_{\text{embed}}=(V, E_{\text{embed}})$ given as input to the embedding methods:
+the shallow embedding methods will use it to learn a lookup table $Z$ of node embeddings, whereas the deep embedding methods aim to learn a function $f$ that can generalize well. 
+The remaining edges in $E_{\text{pred}}$ are instead reserved for the link-prediction task, where the second split occurs:
+from $E_{\text{pred}}$ the sets $E_{\text{train}}$, $E_{\text{val}}$, $E_{\text{test}}$ are created for the training, validation and test of the prediction model. 
+\\\newline
+In order to achieve a balanced distribution of negative edges, each set contains an equal number of positive and negative examples. 
+Furthermore, in order to avoid data leakage, the sampled negative edges must be distinct from those used internally by the embedding algorithms during training.
+\\\newline
+The input of the prediction models are edge embeddings.
+For each edge $(u,v)$, its corresponding embedded representation is constructed by concatenating the embeddings $z_u$, $z_v$ of its incident nodes.
+\\\newline
+The split used in this study is: (from E) $80\%$ for $E_{\text{embed}}$ and $20\%$  for $E_{\text{pred}}$; (from $E_{\text{pred}}$) $60\%$ for $E_{\text{train}}$, $20\%$  for $E_{\text{val}}$ and $20\%$  for $E_{\text{test}}$.
+\\\newline
+Two metrics that are generally used for link prediction are the Area Under the Receiver Operating Characteristic curve (AUROC), and the Area Under the Precision-Recall curve (AUPR). 
+AUROC is historically considered the primary performance metric used to evaluate the performances of link prediction methods \cite{Kalyani2025}. 
+However, AUROC favors accurate classification of positive examples, at the cost of misclassifying the negative ones. 
+In a scenario like the link prediction problem, which is inherently biased towards the negative class, this approach may not be optimal and can overestimate the performance of the methods. 
+Consequently, the AUPR curve was also selected, as it can provide better evaluation of link prediction in the presence of class imbalance. 
+\\\newline
+In regard to the implementation of the embedding techniques mentioned in Sec \ref{sec:embedding}, the following implementations will be adopted:  \cite{Node2VecImpl} for Node2Vec, \cite{LINEImpl} for LINE, \cite{DVNEImpl} for DVNE, \cite{GraphSageImpl} for GraphSage. 
+Depending on specific needs, some of these could be modified or used as an inspiration for different implementations. 
+In particular, DVNE was not evaluated on directed graphs in the original work \cite{DVNE}, meaning it may be necessary to explore adaptations for this setting.
+If no satisfactory solution is found, DVNE will be restricted only for undirected graphs to mantain a fair comparison.
+\\\newline
+The experiments will be conducted using the DEI cluster \emph{"Blade"}.
+The specifications for the nodes of the cluster are available in the open documentation \cite{ClusterDEI}.
+More information about the project's memory usage and runtime will be available in the final report.
+
+\subsection{Results}
+...

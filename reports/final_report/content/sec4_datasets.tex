@@ -1,0 +1,33 @@
+\section{Datasets}
+The datasets that used in this project are nine and they are divided into three categories: road networks, social networks, and biological networks.
+For each of these categories, three datasets of increasing size were selected: one small, one medium, and one large. 
+\\\newline
+The datasets, with their main properties (i.e., the number of nodes, the number of edges, if it is directed, and if it is weighted), are presented in Table \ref{tab:datasets}. 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        \textbf{\scalebox{0.87}{\large{Network}}} & \scalebox{0.87}{\large$\bm{|V|}$} & \scalebox{0.87}{\large$\bm{|E|}$} & \textbf{\scalebox{0.87}{\large{Directed}}} & \textbf{\scalebox{0.87}{\large{Weighted}}} \\
+        \hline
+        Pennsylvania \cite{PennsylvaniaSource,Pennsylvania} & 1,088,092 & 3,083,796 & \ding{51} & \ding{55} \\
+        \hline
+        Padua (province) \cite{padua2025} & 122,728 & 304,184 & \ding{51} & \ding{51} \\
+        \hline
+        Hong Kong (city) \cite{hongkong2025} & 43,620 & 91,542 & \ding{51} & \ding{51} \\
+        \hline
+        Italian Covid-19 Retweet Network \cite{mesina2024italian} & 221,574 & 2,332,721 & \ding{51} & \ding{51} \\
+        \hline
+        Deezer \cite{DeezerSource,Deezer} & 54,573 & 846,915 & \ding{55} & \ding{55} \\
+        \hline
+        GitHub Developers \cite{GitHubSource,GitHub} & 37,700 & 289,003 & \ding{55} & \ding{55} \\
+        \hline
+        Mus Musculus Protein Interactions \cite{STRING} \tablefootnote{Confidence score of $>0.4$} & 20,969 & 808,988 & \ding{55} & \ding{51} \\
+        \hline
+        Saccharomyces cerevisiae Protein Interactions \cite{STRING} \tablefootnote{Confidence score of $>0.7$} & 5,786 & 103,831 & \ding{55} & \ding{51}\\
+        \hline
+        Bio-grid-fission-yeast \cite{nr} & 2,026 & 12,637 & \ding{55} & \ding{55} \\
+        \hline
+    \end{tabular}
+    \caption{Datasets used in the project}
+    \label{tab:datasets}
+\end{table}

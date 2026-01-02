@@ -1,0 +1,18 @@
+\section{Introduction}
+Graphs have emerged as a natural model for the representation and analysis of data and complex systems in various domains. 
+For instance, link prediction in social networks can help to understand the spreading process of rumors or epidemics \cite{pastor2015epidemic}, and in biological networks, it is commonly used for predicting novel interactions between proteins \cite{junker2008analysis}. 
+\\
+However, most traditional machine learning algorithms are not designed to work directly with graph-structured data, as they require numeric vectors or matrices as inputs.
+To address this challenge, embedding techniques have been developed to learn low-dimensional vector representations of nodes, edges, or entire graphs while preserving their topological properties. 
+\\
+Consequently, in order to design an effective embedding technique, it is necessary to consider several criteria \cite{baptista2023zoo}. 
+Two of these are adaptability and scalability.
+An embedding method is considered adaptable if it can be utilized for various data and tasks.
+The scalability of an embedding technique is determined by its capacity to process large-scale networks within a reasonable amount of time. 
+\\\newline
+The objective of this study is to evaluate known embedding methods from the perspective of these two criteria. 
+\\
+From the perspective of adaptability, the objective is to determine the potential impact of the graph domain on the precision of an embedding method.
+In other words, the objective is to ascertain whether there exist approaches that are better suited for a particular field, whether there is one embedding technique that consistently outperforms the others, or if the methods are comparable.
+In the context of scalability, the objective is to identify the embedding methods that are better suited to process large graphs. 
+This is accomplished by evaluating the tradeoff between the accuracy of the predictions and the time required for training and inference.
