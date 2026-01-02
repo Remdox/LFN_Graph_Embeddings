@@ -43,14 +43,14 @@ def node_id_mapping(rows:list[dict], u_key:str, v_key:str) -> list[dict]:
 
     node_ids = dict()
     for row in rows:
-        for k in (u_key, v_key):
-            val = row[k]
-            if val not in node_ids:
-                node_ids[val] = len(node_ids)
-
-    for row in rows:
-        row[u_key] = node_ids[row[u_key]]
-        row[v_key] = node_ids[row[v_key]]
+        u_val = row[u_key]
+        v_val = row[v_key]
+        if u_val not in node_ids:
+            node_ids[u_val] = next_id; next_id += 1
+        if v_val not in node_ids:
+            node_ids[v_val] = next_id; next_id += 1
+        row[u_key] = node_ids[u_val]
+        row[v_key] = node_ids[v_val]
 
     return rows
 
