@@ -13,17 +13,3 @@ class Embedding(ABC):
     @abstractmethod
     def get_node_embedding(self, node_id: int):
         pass
-
-
-class Model(ABC):
-    def __init__(self):
-        super().__init__()
-        # TODO decidere gli attributi
-
-    @abstractmethod
-    def train(self):
-        pass
-
-    @abstractmethod
-    def predict(self):
-        pass

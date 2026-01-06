@@ -14,6 +14,9 @@ def sample_negative_edges(G: Graph, negative_sample_size: int, excluded_edges: t
     - negative_sample_size : integer that defines how many negative edges to generate.
     - excluded_edges [optional]: tensor object containing the edges to exclude from the negative sampling
 
+    Assumptions:
+    - If G is undirected, negative_sample_size is the exact number of undirected edges picked, resulting in 2*negative_sample_size directed edges picked, since Pytorch Geometric represents an undirected edge as 2 directed edges.
+
     Returns:
     - A dataset_utils.Graph object containing: a PyTorch Geometric Data object representing the negative edges, a bool stating if the graph is directed, a bool stating if the graph is weighted
     """
@@ -25,7 +28,10 @@ def sample_negative_edges(G: Graph, negative_sample_size: int, excluded_edges: t
     else:
         positive_edges = G.graph_data.edge_index
 
-    negative_edges_index = negative_sampling(positive_edges, G.graph_data.num_nodes, negative_sample_size, force_undirected=not G.is_directed, method='sparse')
+    # For undirected graphs, negative_sampling takes half of the size given for reversing the edges picked in the first half.
+    # So to make sure to get exactly negative_sample_size undirected edges, we make space for the reversed direction and take 2*negative_sample_size directed edges
+    num_directed_negative_edges = negative_sample_size * (1 if G.is_directed else 2)
+    negative_edges_index = negative_sampling(positive_edges, G.graph_data.num_nodes, num_directed_negative_edges, force_undirected=not G.is_directed, method='sparse')
 
     if G.is_weighted:
         random_indices = torch.randint(0, G.graph_data.edge_attr.size(0),(negative_edges_index.size(1),), device=device)
@@ -36,10 +42,10 @@ def sample_negative_edges(G: Graph, negative_sample_size: int, excluded_edges: t
     negative_graph = Data(edge_index=negative_edges_index, edge_attr=weights, num_nodes=G.graph_data.num_nodes)
 
     # check if enough negative edges were found
-    min_neg_edges = negative_sample_size * (1 if G.is_directed else 2)
+    min_neg_edges = negative_sample_size
     num_neg_edges = negative_edges_index.size(1) // (1 if G.is_directed else 2)
     if num_neg_edges < min_neg_edges:
-        print(f"WARNING: cannot sample a sufficient number of negative edges for the size requested ({num_neg_edges}/{negative_sample_size}).")
+        print(f"WARNING: cannot sample a sufficient number of negative edges for the size requested ({num_neg_edges}/{min_neg_edges}).")
 
     return Graph(negative_graph, G.is_directed, G.is_weighted)
 
@@ -91,7 +97,7 @@ def split_graph_data(G: Graph, val_ratio: float, test_ratio: float) -> tuple[Gra
 # size:  |  [n_nodes x m_features] |      [2 x n_edges]     |  [n_edges x m_features] |   [n_nodes]  |
 #
 # All "value" entries are tensors.
-# The goal of create_split is to find the value of these tensors for a given split, by taking a subset of indices tensor belonging to the graph to split
+# The goal of create_split is to find the value of these tensors for a given split, by taking a subset of indices of the corresponding tensors of the graph to split
 def create_split(G:Graph, index:torch.Tensor) -> Graph:
     """
     Generates a split from the PyG Data object.

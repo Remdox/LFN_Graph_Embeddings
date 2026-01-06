@@ -39,30 +39,40 @@ def main(choose):
 
     for name, dataset in data.items():
         print(f"@@@ DATASET: {name} @@@")
-        # negative sampling from data
-        # sampling from E (whole graph) the size of E_pred negative edges
+        # negative sampling: from E (edge set of whole graph) the size of E_pred negative edges
         print("---- negative sample ----")
         negative_sample_size = int(dataset.graph_data.num_edges * negative_sample_ratio)
         negative_sample = sample_negative_edges(dataset, negative_sample_size)
-        print(negative_sample)
+        print(negative_sample.graph_data)
 
-        # train, test, validation split
+        # embed split
         print("---- embed split ----")
         G_embed, _, G_pred = split_graph_data(dataset, val_ratio=0, test_ratio=0.2)
         print(G_embed.graph_data, _.graph_data, G_pred.graph_data)
-        # the training set should have negative edges different from the other splits
 
-        # add negative edges to G_pred, shuffle, then split
-        G_pred, labels = merge_negative_edges(G_pred, negative_sample)
-        print("---- negative merging ----")
-        print(G_pred, labels)
+        # train, test, validation split
         G_train, G_val, G_test = split_graph_data(G_pred, val_ratio=0.2, test_ratio=0.2)
         print("---- train, val, test split ----")
         print(G_train.graph_data, G_val.graph_data, G_test.graph_data)
 
-        # get embeddings of all 3 classification datasets
+        # TRAINING EMBEDDINGS
 
-        # train ML classification models with the training set
+        # add negative edges to G_train, G_val, G_test
+        # the training set must have negative edges different from the other splits
+        print("---- negative split ----")
+        train_neg, val_neg, test_neg = split_graph_data(negative_sample, val_ratio=0.2, test_ratio=0.2)
+        print(train_neg, val_neg, test_neg)
+        print("---- negative merging ----")
+        G_train, train_labels = merge_negative_edges(G_train, train_neg)
+        G_val,   val_labels   = merge_negative_edges(G_val, val_neg)
+        G_test,  test_labels  = merge_negative_edges(G_test, test_neg)
+        print(G_train.graph_data, G_val.graph_data, G_test.graph_data)
+        print("--- labels ---")
+        print(train_labels, val_labels, test_labels)
+
+        # GET EMBEDDINGS of all 3 classification datasets
+
+        # TRAIN ML classification models with the embedding of the training set
 
         # test ML classification
 

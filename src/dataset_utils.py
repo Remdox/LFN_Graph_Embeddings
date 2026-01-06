@@ -37,7 +37,6 @@ def dataset_as_graph(dataset: list[dict]) -> Data:
     # but since there are no node features then x is not defined, and PyTorch has to fall back to the maximum edge_index it can find from the given graph, causing a warning.
     # Since the number of nodes is inferred by reading the edges of the dataset, it's not actually a  problem and we fix the number of nodes immediately.
     dataset_graph.num_nodes = int(dataset_graph.edge_index.max()) + 1
-    print(dataset_graph.num_nodes)
 
     return dataset_graph
 
