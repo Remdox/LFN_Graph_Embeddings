@@ -4,13 +4,11 @@ sys.path.append('.')
 from include.graphsage.model import run_data
 
 class Embedding(ABC):
-    def __init__(self, graph, directed: bool, weighted: bool):
-        self.graph = graph
-        self.directed = directed
-        self.weighted = weighted
+    def __init__(self):
+        pass
 
     @abstractmethod
-    def train_embed(self):
+    def train_embed(self, graph: Graph):
         pass
 
     @abstractmethod
