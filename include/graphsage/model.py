@@ -113,7 +113,7 @@ def run_data(graph):
     train_nodes = list(adj_lists.keys())
 
     for batch in range(200):
-        batch_nodes = random.sample(train_nodes, 1024)
+        batch_nodes = random.sample(train_nodes, min(len(train_nodes), 1024))
         batch_labels = torch.LongTensor(labels[np.array(batch_nodes)])
 
         optimizer.zero_grad()
@@ -123,31 +123,7 @@ def run_data(graph):
         
         print(f"Batch {batch}, Loss: {loss.item()}")
 
-    # Production of final embeddings 
-    print("Starting embedding extraction...")
+    # Production of trained model
+    print("Training completed!")
     graphsage.eval()
-    all_nodes = np.arange(num_nodes)
-    # Splits nodes into 50 chunks to avoid memory overflow
-    node_chuncks = np.array_split(all_nodes, 50)
-    all_embs = []
-    processed_nodes = 0
-    with torch.no_grad():
-        for chunk in node_chuncks:
-            chunk_emb = graphsage.embed(chunk)
-            if chunk_emb.shape[0] == 128 and chunk_emb.shape[1] != 128:
-                chunk_emb = chunk_emb.t()
-            
-            all_embs.append(chunk_emb.detach().cpu().numpy())
-
-            processed_nodes += len(chunk)
-            print(f"Processed {processed_nodes}/{num_nodes} nodes")
-        
-    final_embeddings = np.concatenate(all_embs, axis=0)
-    print(f"Embedding saved!")
-    return final_embeddings
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        run_data(sys.argv[1])
-    else:
-        print("Error! Usage: python model.py graph")
+    return graphsage
