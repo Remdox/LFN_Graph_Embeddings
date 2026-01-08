@@ -38,7 +38,7 @@ class SupervisedGraphSage(nn.Module):
     def embed(self, nodes):
         return self.enc(nodes)
 
-def load_data(graph):
+def load_data(graph, feat_data):
     """
     Converts the graph into the structures required for GraphSage.
 
@@ -53,18 +53,6 @@ def load_data(graph):
     num_nodes = graph.num_nodes
     u_list = graph.edge_index[0].numpy()
     v_list = graph.edge_index[1].numpy()
-    weights = graph.edge_attr.numpy()
-    feat_data = np.zeros((num_nodes, 2))
-
-    df = pd.DataFrame({'u': u_list, 'weight': weights})
-    weights_sum = df.groupby('u')['weight'].sum()
-    weights_max = df.groupby('u')['weight'].max()
-    # Assigns to feat_data[node_id, 0] the sum of all the weights of node_id and to feat_data[node_id, 1] the max weight of node_id    
-    for node_id in weights_sum.index:
-        feat_data[node_id, 0] = weights_sum[node_id]
-        feat_data[node_id, 1] = weights_max[node_id]
-    # Z-score standardization of the weights as features
-    feat_data = (feat_data - feat_data.mean(axis=0)) / (feat_data.std(axis=0) + 1e-7)
     
     # Creation of labels: label is 1 if the sum of all the weights of a specific node is greater than the median of the weights and is 0 otherwise
     labels = np.zeros((num_nodes, 1), dtype=np.int64)
@@ -78,9 +66,9 @@ def load_data(graph):
         adj_lists[int(u)].add(int(v))
         adj_lists[int(v)].add(int(u))
         
-    return feat_data, labels, adj_lists
+    return labels, adj_lists
 
-def run_data(graph):
+def run_data(graph, feat_data):
     """
     Loads the graph data, trains the GraphSage model and produces node embeddings.
 
@@ -93,7 +81,7 @@ def run_data(graph):
     np.random.seed(1)
     random.seed(1)
     torch.manual_seed(1) # TODO capire se lasciare o no
-    feat_data, labels, adj_lists = load_data(graph)
+    labels, adj_lists = load_data(graph, feat_data)
     num_nodes = feat_data.shape[0]
     num_feat = feat_data.shape[1]
     features = nn.Embedding(num_nodes, num_feat)
