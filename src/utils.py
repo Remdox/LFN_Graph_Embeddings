@@ -1,4 +1,5 @@
 import csv
+import time
 
 
 def parser(filename:str) -> list[dict]:
@@ -21,3 +22,27 @@ def parser(filename:str) -> list[dict]:
             rows.append(row)
 
     return rows
+
+def get_current_time_ms() -> int:
+    """
+    Returns the current time in milliseconds.
+
+    Returns:
+    - Current time in milliseconds.
+    """
+
+    return int(time.time() * 1000)
+
+def elapsed_time_ms(start_time: int, end_time: int) -> int:
+    """
+    Calculates the elapsed time in milliseconds between two timestamps.
+
+    Parameters:
+    - start_time: start timestamp in milliseconds.
+    - end_time: end timestamp in milliseconds.
+
+    Returns:
+    - Elapsed time in milliseconds.
+    """
+    
+    return end_time - start_time
