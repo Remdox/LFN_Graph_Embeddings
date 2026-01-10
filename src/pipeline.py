@@ -127,8 +127,8 @@ def main(data, embed, model):
                 pred = mod.predict(embedded_test)
 
                 # metrics
-                print(f"AUROC: {evaluate_AUROC(pred, test_labels)}")
-                print(f"AUPR: {evaluate_AUPR(pred, test_labels)}")
+                print(f"AUROC: {evaluate_AUROC(test_labels, pred)}")
+                print(f"AUPR: {evaluate_AUPR(test_labels, pred)}")
 
 
 if __name__ == "__main__":

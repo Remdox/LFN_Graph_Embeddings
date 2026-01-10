@@ -44,7 +44,7 @@ def train(model: SVM, X: torch.Tensor, y: torch.Tensor) -> SVM:
     optimizer = optim.SGD(model.parameters(), lr=0.01)
 
     epochs = 200
-    C = 1.0  # Regularization parameter (controls the strength of L2 regularization)
+    C = 0.01
 
     for epoch in range(epochs):
         
@@ -54,8 +54,6 @@ def train(model: SVM, X: torch.Tensor, y: torch.Tensor) -> SVM:
         loss = hinge_loss(y, y_pred) + C * torch.norm(model.linear.weight) ** 2
         loss.backward()
         optimizer.step()
-
-        print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
 
     return model
 
