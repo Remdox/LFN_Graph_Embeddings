@@ -48,7 +48,7 @@ class GraphSage(Embedding):
             emb = self.model.embed(node_t)
             if emb.shape[0] == 128 and (len(emb.shape) == 1 or emb.shape[1] != 128):
                 emb = emb.t()
-        return emb.squeeze().cpu()
+        return torch.as_tensor(emb.squeeze())
     
     def compute_features(self, graph):
         # Creation of features for each node

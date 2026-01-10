@@ -3,8 +3,6 @@ import torch.nn as nn
 from torch.nn import init
 from torch.autograd import Variable
 
-import pandas as pd
-import sys
 import numpy as np
 import random
 from collections import defaultdict
@@ -43,10 +41,11 @@ def load_data(graph, feat_data):
     Converts the graph into the structures required for GraphSage.
 
     Parameter:
-    - graph: a PyTorch Geometric Data object.
+    - graph: a PyTorch Geometric Data object,
+    - feat_data: matrix of features of shape (num_nodes, 3), where each 
+                 row contains [weights_sum, weights_max, num_neighbors].
 
     Returns:
-    - feat_data: normalized node features (sum and max of edge weights),
     - labels: binary labels based on the sum of weights of each node,
     - adj_lists: adjacency list for each pair of nodes.
     """
@@ -70,17 +69,19 @@ def load_data(graph, feat_data):
 
 def run_data(graph, feat_data):
     """
-    Loads the graph data, trains the GraphSage model and produces node embeddings.
+    Loads the graph data, trains the GraphSage model and produces the trained GraphSage model.
 
     Parameter:
-    - graph: a PyTorch Geometric Data object.
+    - graph: a PyTorch Geometric Data object,
+    feat_data: matrix of features of shape (num_nodes, 3), where each 
+                 row contains [weights_sum, weights_max, num_neighbors].
 
     Returns:
-    - final_embeddings: Numpy array of shape (num_nodes, 128).
+    - graphsage: trained GraphSage model.
     """
     np.random.seed(1)
     random.seed(1)
-    torch.manual_seed(1) # TODO capire se lasciare o no
+    torch.manual_seed(1)
     labels, adj_lists = load_data(graph, feat_data)
     num_nodes = feat_data.shape[0]
     num_feat = feat_data.shape[1]
