@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
-from sklearn import svm
+
+from include.svm.model import SVM as SVMModel
+from include.svm.model import train as train_svm
+from include.svm.model import predict as predict_svm
 import torch
 from torch.nn.functional import dropout
 from torch.nn import Linear
+
 
 class Model(ABC):
     def __init__(self):
@@ -17,15 +21,18 @@ class Model(ABC):
     def predict(self, X):
         pass
 
+
 class SVM(Model):
     def __init__(self):
-        self.model = svm.SVC(kernel="linear", C=1e4)
+        self.model = None
 
     def train_model(self, X, y):
-        self.model.fit(X, y)
+        self.model = SVMModel(X.shape[1])
+        self.model = train_svm(self.model, X, y)
 
     def predict(self, X):
-        return self.model.predict(X)
+        return predict_svm(self.model, X)
+
 
 class MLP(torch.nn.Module, Model):
     def __init__(self, input_dim=257, hidden_channels=16, lr=0.01, weight_decay=5e-4):
