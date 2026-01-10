@@ -186,8 +186,8 @@ def merge_negative_edges(G_pos: Graph, G_neg: Graph):
     merged_data.edge_attr  = shuffled_edge_attr
 
     # merge + shuffle of edge labels
-    pos_labels = torch.ones(pos_data.edge_index.size(1), device=device)
-    neg_labels = torch.zeros(neg_data.edge_index.size(1), device=device)
+    pos_labels = torch.ones(pos_data.edge_index.size(1), dtype=torch.long, device=device)
+    neg_labels = torch.zeros(neg_data.edge_index.size(1), dtype=torch.long, device=device)
     merged_labels = torch.cat([pos_labels, neg_labels], dim=0)
     shuffled_edge_labels = merged_labels[perm]
 

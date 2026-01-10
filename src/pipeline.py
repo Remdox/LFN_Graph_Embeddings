@@ -16,22 +16,25 @@ import embeddings
 from embeddings import GraphSage
 from embeddings import Node2Vec
 import models
-from models import SVM
+import model_utils
+from model_utils import evaluate_AUROC, evaluate_AUPR
+from models import SVM, MLP
 
 RANDOM_SEED = 104
 
 E_EMBED_RATIO = 0.8
 E_PRED_RATIO  = 1 - E_EMBED_RATIO
 
-E_TRAIN_RATIO         = 0.6
-E_TEST_RATIO          = 0.2
-E_VAL_RATIO           = 1 - E_TRAIN_RATIO - E_TEST_RATIO
+E_TRAIN_RATIO = 0.6
+E_TEST_RATIO  = 0.2
+E_VAL_RATIO   = 1 - E_TRAIN_RATIO - E_TEST_RATIO
 
 @click.command()
 @click.option("--data", required=False, help="Choose the name of a single dataset to analyze")
 @click.option("--embed", required=False, help="Choose the name of a single embedding method to use")
 @click.option("--model", required=False, help="Choose the name of a single classification model to use")
 def main(data, embed, model):
+    torch.manual_seed(RANDOM_SEED)
     random.seed(a=RANDOM_SEED)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     negative_sample_ratio = 1 * E_PRED_RATIO
@@ -51,8 +54,12 @@ def main(data, embed, model):
     for name, cls in embed_methods.items():
         embed_methods[name] = cls()
 
-    models = {"SVM":SVM}
-    print(embed_methods)
+    models = {"SVM":SVM, "MLP":MLP}
+    if model:
+        models = {model: models[model]}
+    for name, cls in models.items():
+        models[name] = cls()
+
     for name, dataset in datasets.items():
         print(f"@@@ DATASET: {name} @@@")
         # negative sampling: from E (edge set of whole graph) the size of E_pred negative edges
@@ -86,7 +93,7 @@ def main(data, embed, model):
         G_val,   val_labels   = merge_negative_edges(G_val, val_neg)
         G_test,  test_labels  = merge_negative_edges(G_test, test_neg)
         print(G_train.graph_data, G_val.graph_data, G_test.graph_data)
-        print("--- labels ---")
+        print("---- labels ----")
         print(train_labels, val_labels, test_labels)
 
         # GET EMBEDDINGS of all 3 classification datasets
@@ -94,22 +101,34 @@ def main(data, embed, model):
             embed_methods['GraphSage'].update_features(embed_methods['GraphSage'].compute_features(dataset))
             embed_methods['GraphSage'].update_adjacency(G_pred.graph_data.edge_index)
 
-        embeddings_train = []
-        embeddings_val   = []
-        embeddings_test  = []
-        for name, method in embed_methods.items():
-            print(f"Embedding edges with method: {name}")
-            embeddings_train.append(embed_edges(G_train, method))
-            embeddings_val.append(embed_edges(G_val, method))
-            embeddings_test.append(embed_edges(G_test, method))
 
-        print("Embeddings done")
+        for method_name, method in embed_methods.items():
+            print(f"Embedding edges with method: {method_name}")
+            print(G_train.graph_data.edge_index.shape)
+            print(G_train.graph_data.edge_attr.shape)
+            embedded_train = embed_edges(G_train, method)
+            embedded_val   = embed_edges(G_val, method)
+            embedded_test  = embed_edges(G_test, method)
 
-        # TRAIN ML classification models with the embedding of the training set
+            print("Embeddings done")
 
-        # test ML classification
+            # train with the embedding of the training set
 
-        # metrics
+            for name, mod in models.items():
+                print(f"---- Train, validation, test of model {name} ----")
+                print(f"Training model {name}")
+                print(embedded_train.shape)
+                mod.train_model(embedded_train, train_labels)
+
+                # validate AND test ML classification models
+                print(f"Validating model {name}")
+
+                print(f"Testing model {name}")
+                pred = mod.predict(embedded_test)
+
+                # metrics
+                print(f"AUROC: {evaluate_AUROC(pred, test_labels)}")
+                print(f"AUPR: {evaluate_AUPR(pred, test_labels)}")
 
 
 if __name__ == "__main__":
