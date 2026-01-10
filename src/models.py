@@ -28,11 +28,9 @@ class SVM(Model):
 
     def train_model(self, X, y):
         self.model = SVMModel(X.shape[1])
-        X = X.float()
         self.model = train_svm(self.model, X, y)
 
     def predict(self, X):
-        X = X.float()
         return predict_svm(self.model, X)
 
 

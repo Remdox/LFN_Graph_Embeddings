@@ -30,7 +30,7 @@ class Node2Vec(Embedding):
         return self.embedding_matrix
     
     def get_node_embedding(self, node_id):
-        return torch.tensor(self.embedding_matrix[node_id])
+        return torch.tensor(self.embedding_matrix[node_id]).float()
 
 class GraphSage(Embedding):
     def __init__(self):
