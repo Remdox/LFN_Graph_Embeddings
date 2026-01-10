@@ -26,11 +26,11 @@ class Node2Vec(Embedding):
         self.embedding_matrix = None
 
     def train_embed(self, graph):
-        self.embedding_matrix = run_data_node2vec(graph)
+        self.embedding_matrix = run_data_node2vec(graph.graph_data)
         return self.embedding_matrix
     
     def get_node_embedding(self, node_id):
-        return self.embedding_matrix[node_id]
+        return torch.tensor(self.embedding_matrix[node_id])
 
 class GraphSage(Embedding):
     def __init__(self):

@@ -3,6 +3,8 @@ from torch_geometric.data import Data
 from torch_geometric.utils import negative_sampling
 import dataset_utils
 from dataset_utils import Graph
+import embeddings
+from embeddings import Embedding
 
 # TODO: hard negative sampling?
 def sample_negative_edges(G: Graph, negative_sample_size: int, excluded_edges: torch.Tensor|None = None) -> Graph:
@@ -192,5 +194,28 @@ def merge_negative_edges(G_pos: Graph, G_neg: Graph):
     merged_graph = Graph(merged_data, G_pos.is_directed, G_pos.is_weighted)
 
     return (merged_graph, shuffled_edge_labels)
+
+def embed_edges(G:Graph, emb_method:Embedding):
+    """
+    Takes the edges of the graph and returns their embeddings.
+
+    Parameters:
+    - G: graph contianing the edges to embed
+    - emb_method: embedding method to use
+
+    Returns:
+    - A bidimensional torch.Tensor [num_edges x features(embedding length + edge attr length)]
+    """
+    embeddings = []
+    for edge, attr in zip(G.graph_data.edge_index.t(), G.graph_data.edge_attr):
+        node_a = edge[0].item()
+        node_b = edge[1].item()
+
+        # combination method: concatenation
+        edge_embedding = torch.cat([emb_method.get_node_embedding(node_a), emb_method.get_node_embedding(node_b), attr.view(-1)], dim=0)
+
+        embeddings.append(edge_embedding)
+
+    return torch.stack(embeddings)
 
 
