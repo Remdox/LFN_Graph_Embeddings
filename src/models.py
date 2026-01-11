@@ -1,17 +1,16 @@
 from abc import ABC, abstractmethod
+import torch
+from torch.nn.functional import dropout
+from torch.nn import Linear
+import xgboost as xgb
 
 from include.svm.model import SVM as SVMModel
 from include.svm.model import train as train_svm
 from include.svm.model import predict as predict_svm
-import torch
-from torch.nn.functional import dropout
-from torch.nn import Linear
-
 
 class Model(ABC):
     def __init__(self):
         super().__init__()
-        # TODO decidere gli attributi
 
     @abstractmethod
     def train_model(self, X, y):
@@ -32,6 +31,18 @@ class SVM(Model):
 
     def predict(self, X):
         return predict_svm(self.model, X)
+
+class RandomForest(Model):
+    def __init__(self):
+        self.model = None
+
+    def train_model(self, X, y):
+        self.model = xgb.XGBRFClassifier(n_estimators=100, max_depth=10, tree_method='hist', random_state=104)
+        self.model.fit(X.detach(), y.detach())
+
+    def predict(self, X):
+        pred = self.model.predict(X.detach())
+        return pred
 
 
 class MLP(torch.nn.Module, Model):

@@ -11,9 +11,9 @@ from dataset_utils import Graph
 import pipeline_utils
 from pipeline_utils import sample_negative_edges, split_graph_data, merge_negative_edges, embed_edges
 import embeddings
-from embeddings import GraphSage, Node2Vec
+from embeddings import GraphSage, Node2Vec, LINE
 import models
-from models import SVM, MLP
+from models import SVM, MLP, RandomForest
 import model_utils
 from model_utils import evaluate_AUROC, evaluate_AUPR
 
@@ -47,13 +47,13 @@ def main(data, embed, model):
         datasets.clear()
         datasets[dataset_name] = dataset # my_dataset Bio_grid_fission_yeast
 
-    embed_methods = {"GraphSage":GraphSage, "Node2Vec":Node2Vec}
+    embed_methods = {"GraphSage":GraphSage, "Node2Vec":Node2Vec, "Line":LINE}
     if embed:
         embed_methods = {embed: embed_methods[embed]}
     for name, cls in embed_methods.items():
         embed_methods[name] = cls()
 
-    models = {"SVM":SVM, "MLP":MLP}
+    models = {"SVM":SVM, "MLP":MLP, "RandomForest":RandomForest}
     if model:
         models = {model: models[model]}
     for name, cls in models.items():
@@ -151,7 +151,7 @@ def main(data, embed, model):
 
                 # metrics
                 print(f"AUROC: {evaluate_AUROC(test_labels, pred)}")
-                print(f"AUPR: {evaluate_AUPR(test_labels, pred)}")
+                print(f"AUPR: {evaluate_AUPR(test_labels, pred)}\n")
                  # GS+MLP
                  # 0.8677982550730319 AUROC
                  # 0.7467608911257131 AURPR

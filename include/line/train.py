@@ -68,5 +68,5 @@ def run_data(graph, total_dim=128, epochs=10, batch_size=4096, initial_lr=0.025)
     # Returns the embeddings matrix with embeddings of both orders
     final_tensor = torch.cat(all_embs, dim=1)
     
-    print(f"Training completed. Matrix shape: {final_tensor.shape}")
+    print(f"Training completed!")
     return final_tensor
