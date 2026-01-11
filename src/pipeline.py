@@ -4,21 +4,18 @@ import random
 import torch
 import time
 import click
+import copy
 from pathlib import Path
 import dataset_utils
 from dataset_utils import Graph
 import pipeline_utils
-from pipeline_utils import sample_negative_edges
-from pipeline_utils import split_graph_data
-from pipeline_utils import merge_negative_edges
-from pipeline_utils import embed_edges
+from pipeline_utils import sample_negative_edges, split_graph_data, merge_negative_edges, embed_edges
 import embeddings
-from embeddings import GraphSage
-from embeddings import Node2Vec
+from embeddings import GraphSage, Node2Vec
 import models
+from models import SVM, MLP
 import model_utils
 from model_utils import evaluate_AUROC, evaluate_AUPR
-from models import SVM, MLP
 
 RANDOM_SEED = 104
 
@@ -38,6 +35,8 @@ def main(data, embed, model):
     random.seed(a=RANDOM_SEED)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     negative_sample_ratio = 1 * E_PRED_RATIO
+    MLP_num_epochs = 200
+    MLP_patience = 20
 
     datasets = dataset_utils.get_datasets()
     if data:
@@ -60,8 +59,8 @@ def main(data, embed, model):
     for name, cls in models.items():
         models[name] = cls()
 
-    for name, dataset in datasets.items():
-        print(f"@@@ DATASET: {name} @@@")
+    for data_name, dataset in datasets.items():
+        print(f"@@@ DATASET: {data_name} @@@")
         # negative sampling: from E (edge set of whole graph) the size of E_pred negative edges
         print("---- negative sample ----")
         negative_sample_size = int(dataset.graph_data.num_edges * negative_sample_ratio)
@@ -75,7 +74,11 @@ def main(data, embed, model):
 
         # TRAINING EMBEDDINGS
 
-        for emb_method in embed_methods.values():
+        if embed_methods.get('DVNE') is not None:
+            print(embed_methods['DVNE'].sample_triplets(G_embed, G_pred.graph_data.edge_index))
+
+        for name, emb_method in embed_methods.items():
+            print(f"Training: {name}")
             emb_method.train_embed(G_embed)
 
         # train, test, validation split
@@ -103,9 +106,7 @@ def main(data, embed, model):
 
 
         for method_name, method in embed_methods.items():
-            print(f"Embedding edges with method: {method_name}")
-            print(G_train.graph_data.edge_index.shape)
-            print(G_train.graph_data.edge_attr.shape)
+            print(f"---- Embedding edges with method: {method_name} ----")
             embedded_train = embed_edges(G_train, method)
             embedded_val   = embed_edges(G_val, method)
             embedded_test  = embed_edges(G_test, method)
@@ -117,11 +118,33 @@ def main(data, embed, model):
             for name, mod in models.items():
                 print(f"---- Train, validation, test of model {name} ----")
                 print(f"Training model {name}")
-                print(embedded_train.shape)
-                mod.train_model(embedded_train, train_labels)
+                if name == "MLP":
+                    best_val_loss = float('inf')
+                    epochs_wout_improvement = 0
+                    best_model_wts = copy.deepcopy(mod.state_dict())
+                    for epoch in range(1, MLP_num_epochs):
+                        train_loss = mod.train_model(embedded_train, train_labels)
 
-                # validate AND test ML classification models
-                print(f"Validating model {name}")
+                        mod.eval()
+                        with torch.no_grad():
+                            val_loss = mod.criterion(mod(embedded_val), val_labels.long()).item()
+
+                        if val_loss < best_val_loss:
+                            best_val_loss = val_loss
+                            best_model_wts = copy.deepcopy(mod.state_dict())
+                            epochs_wout_improvement = 0
+                        else:
+                            epochs_wout_improvement += 1
+
+                        if epochs_wout_improvement == MLP_patience:
+                            print(f"Early Stopping at {epoch} epochs")
+                            break
+
+                        if epoch % 50 == 0:
+                            print(f"Epoch {epoch} | Train loss: {train_loss:.4f} | Val loss: {val_loss:.4f}")
+                    mod.load_state_dict(best_model_wts)
+                else:
+                    mod.train_model(embedded_train, train_labels)
 
                 print(f"Testing model {name}")
                 pred = mod.predict(embedded_test)
@@ -129,6 +152,13 @@ def main(data, embed, model):
                 # metrics
                 print(f"AUROC: {evaluate_AUROC(test_labels, pred)}")
                 print(f"AUPR: {evaluate_AUPR(test_labels, pred)}")
+                 # GS+MLP
+                 # 0.8677982550730319 AUROC
+                 # 0.7467608911257131 AURPR
+
+                 # N2V+MLP
+                 # 0.8974720615625918 AUROC
+                 # 0.8209333103906062 AURPR
 
 
 if __name__ == "__main__":

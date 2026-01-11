@@ -35,22 +35,24 @@ class SVM(Model):
 
 
 class MLP(torch.nn.Module, Model):
-    def __init__(self, input_dim=257, hidden_channels=16, lr=0.01, weight_decay=5e-4):
+    def __init__(self, input_dim:int =257, hidden_channels:int =16, lr:float =0.01, weight_decay:float =5e-4):
         super().__init__()
         self.lin1 = Linear(input_dim, hidden_channels)
         self.lin2 = Linear(hidden_channels, 2)
         self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=weight_decay)
         self.out = None
+        num_epochs = 200
+        patience = 20
 
-    def forward(self, X):
+    def forward(self, X:torch.Tensor):
         X = self.lin1(X)
         X = X.relu()
         X = dropout(X, p=0.5, training=self.training)
         X = self.lin2(X)
         return X
 
-    def train_model(self, X, Y):
+    def train_model(self, X:torch.Tensor, Y:torch.Tensor):
         self.train()
         self.optimizer.zero_grad()
         self.out = self.forward(X)
@@ -59,9 +61,8 @@ class MLP(torch.nn.Module, Model):
         self.optimizer.step()
         return loss.item()
 
-    def predict(self, X):
+    def predict(self, X:torch.Tensor):
         self.eval()
         with torch.no_grad():
             out = self.forward(X)
-            pred = out.argmax(dim=1)
-            return pred
+            return torch.softmax(out, dim=1)[:, 1]
