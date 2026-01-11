@@ -109,8 +109,6 @@ def run_data(graph, feat_data):
         loss = graphsage.loss(batch_nodes, batch_labels)
         loss.backward()
         optimizer.step()
-        
-        print(f"Batch {batch}, Loss: {loss.item()}")
 
     # Production of trained model
     print("Training completed!")
