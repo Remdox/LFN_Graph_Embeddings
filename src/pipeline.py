@@ -11,11 +11,12 @@ from dataset_utils import Graph
 import pipeline_utils
 from pipeline_utils import sample_negative_edges, split_graph_data, merge_negative_edges, embed_edges
 import embeddings
-from embeddings import GraphSage, Node2Vec, LINE
+from embeddings import GraphSage, Node2Vec, LINE, DVNE
 import models
 from models import SVM, MLP, RandomForest
 import model_utils
 from model_utils import evaluate_AUROC, evaluate_AUPR
+from utils import get_current_time_ms, elapsed_time_ms
 
 RANDOM_SEED = 104
 
@@ -38,7 +39,7 @@ def main(data, embed, model):
     MLP_num_epochs = 200
     MLP_patience = 20
 
-    datasets = dataset_utils.get_datasets()
+    datasets = dataset_utils.get_datasets(device=device)
     if data:
         dataset_name = Path(data).stem
         dataset = datasets.pop(dataset_name, None)
@@ -47,11 +48,11 @@ def main(data, embed, model):
         datasets.clear()
         datasets[dataset_name] = dataset # my_dataset Bio_grid_fission_yeast
 
-    embed_methods = {"GraphSage":GraphSage, "Node2Vec":Node2Vec, "Line":LINE}
+    embed_methods = {"GraphSage":GraphSage, "Node2Vec":Node2Vec, "LINE":LINE, "DVNE":DVNE}
     if embed:
         embed_methods = {embed: embed_methods[embed]}
     for name, cls in embed_methods.items():
-        embed_methods[name] = cls()
+        embed_methods[name] = cls(device)
 
     models = {"SVM":SVM, "MLP":MLP, "RandomForest":RandomForest}
     if model:
@@ -75,11 +76,14 @@ def main(data, embed, model):
         # TRAINING EMBEDDINGS
 
         if embed_methods.get('DVNE') is not None:
-            print(embed_methods['DVNE'].sample_triplets(G_embed, G_pred.graph_data.edge_index))
+            embed_methods['DVNE'].set_sampled_triplets(G_embed, G_embed.graph_data.size(1), G_pred.graph_data.edge_index)
 
         for name, emb_method in embed_methods.items():
             print(f"Training: {name}")
+            start_time = get_current_time_ms()
             emb_method.train_embed(G_embed)
+            end_time = get_current_time_ms()
+            print(f"Finished training of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
 
         # train, test, validation split
         G_train, G_val, G_test = split_graph_data(G_pred, val_ratio=0.2, test_ratio=0.2)
@@ -107,21 +111,22 @@ def main(data, embed, model):
 
         for method_name, method in embed_methods.items():
             print(f"---- Embedding edges with method: {method_name} ----")
+            start_time = get_current_time_ms()
             embedded_train = embed_edges(G_train, method)
             embedded_val   = embed_edges(G_val, method)
             embedded_test  = embed_edges(G_test, method)
-
-            print("Embeddings done")
+            end_time = get_current_time_ms()
+            print(f"{method_name} embeddings done after {elapsed_time_ms(start_time, end_time)/1000} s")
 
             # train with the embedding of the training set
-
+            start_time = get_current_time_ms()
             for name, mod in models.items():
                 print(f"---- Train, validation, test of model {name} ----")
                 print(f"Training model {name}")
                 if name == "MLP":
                     best_val_loss = float('inf')
                     epochs_wout_improvement = 0
-                    best_model_wts = copy.deepcopy(mod.state_dict())
+                    best_model_weights = copy.deepcopy(mod.state_dict())
                     for epoch in range(1, MLP_num_epochs):
                         train_loss = mod.train_model(embedded_train, train_labels)
 
@@ -131,7 +136,7 @@ def main(data, embed, model):
 
                         if val_loss < best_val_loss:
                             best_val_loss = val_loss
-                            best_model_wts = copy.deepcopy(mod.state_dict())
+                            best_model_weights = copy.deepcopy(mod.state_dict())
                             epochs_wout_improvement = 0
                         else:
                             epochs_wout_improvement += 1
@@ -142,12 +147,18 @@ def main(data, embed, model):
 
                         if epoch % 50 == 0:
                             print(f"Epoch {epoch} | Train loss: {train_loss:.4f} | Val loss: {val_loss:.4f}")
-                    mod.load_state_dict(best_model_wts)
+                    mod.load_state_dict(best_model_weights)
                 else:
                     mod.train_model(embedded_train, train_labels)
 
+                end_time = get_current_time_ms()
+                print(f"Finished training of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
+
+                start_time = get_current_time_ms()
                 print(f"Testing model {name}")
                 pred = mod.predict(embedded_test)
+                end_time = get_current_time_ms()
+                print(f"Finished test of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
 
                 # metrics
                 print(f"AUROC: {evaluate_AUROC(test_labels, pred)}")

@@ -9,7 +9,7 @@ class Graph:
     is_directed: bool
     is_weighted: bool
 
-def dataset_as_graph(dataset: list[dict]) -> Data:
+def dataset_as_graph(dataset: list[dict], device: str = 'cpu') -> Data:
     """
     Converts a dataset from a list of edges to a graph.
 
@@ -30,8 +30,8 @@ def dataset_as_graph(dataset: list[dict]) -> Data:
         edge_index[1].append(int(edge['v']))
         edge_attributes.append(float(edge['weight']))
 
-    dataset_graph.edge_index = torch.tensor(edge_index, dtype=torch.long)
-    dataset_graph.edge_attr = torch.tensor(edge_attributes, dtype=torch.float)
+    dataset_graph.edge_index = torch.tensor(edge_index, dtype=torch.long, device=device)
+    dataset_graph.edge_attr = torch.tensor(edge_attributes, dtype=torch.float, device=device)
 
     # if num_nodes is not fixed, PyG tries to compute the number of nodes using the size of column x,
     # but since there are no node features then x is not defined, and PyTorch has to fall back to the maximum edge_index it can find from the given graph, causing a warning.
@@ -41,7 +41,7 @@ def dataset_as_graph(dataset: list[dict]) -> Data:
     return dataset_graph
 
 
-def get_datasets() -> dict[str, tuple[Data, bool, bool]]:
+def get_datasets(device:str = 'cpu') -> dict[str, tuple[Data, bool, bool]]:
     """
     Loads all processed datasets into a dictionary.
 
@@ -52,6 +52,7 @@ def get_datasets() -> dict[str, tuple[Data, bool, bool]]:
     - A dictionary where keys are dataset names and values are tuples (graph, directed, weighted).
     """
 
+    print(f"Using device: {device}")
     # Load dataset information
     datasets_csv = parser('./datasets/datasets_info.csv')
 
@@ -62,7 +63,7 @@ def get_datasets() -> dict[str, tuple[Data, bool, bool]]:
         name = dataset['name']
         print(f'Loading dataset: {name}...')
         filename = f'./datasets/processed_datasets/{name}.csv'
-        data = Graph(dataset_as_graph(parser(filename)), dataset['directed'] == 'True', dataset['weight'] != '')
+        data = Graph(dataset_as_graph(parser(filename), device), dataset['directed'] == 'True', dataset['weight'] != '')
         datasets[dataset['name']] = data
 
     return datasets
