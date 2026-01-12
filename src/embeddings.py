@@ -24,26 +24,18 @@ class Embedding(ABC):
 
 class Node2Vec(Embedding):
     def __init__(self):
-        self.embedding_matrix = None
+        self.model = None
 
     def train_embed(self, graph):
-        self.embedding_matrix = run_data_node2vec(graph.graph_data)
-        return self.embedding_matrix
+        self.model = run_data_node2vec(graph.graph_data)
+        return self.model
     
     def get_node_embedding(self, node_id):
-        return torch.tensor(self.embedding_matrix[node_id]).float()
-    
-class LINE(Embedding):
-    def __init__(self):
-        super().__init__()
-        self.embedding_matrix = None
-
-    def train_embed(self, graph):
-        self.embedding_matrix = run_data_line(graph)
-        return self.embedding_matrix
-    
-    def get_node_embedding(self, node_id):
-        return self.embedding_matrix[node_id]
+        self.model.eval()
+        node_tensor = torch.as_tensor(node_id, dtype=torch.long)
+        with torch.no_grad():
+            embedding = self.model.embedding(node_tensor)
+        return embedding
 
 class GraphSage(Embedding):
     def __init__(self):
