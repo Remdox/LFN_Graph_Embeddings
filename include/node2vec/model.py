@@ -1,12 +1,8 @@
-import os
-import numpy
-
+import torch
 from torch_geometric.data import Data
+from torch_geometric.nn.models import Node2Vec
 
-import networkx as nx
-from node2vec import Node2Vec
-
-def run_data(graph: Data) -> numpy.ndarray:
+def run_data(graph: Data) -> Node2Vec:
     """
     Trains the GraphSage model and produces node embeddings.
 
@@ -14,41 +10,31 @@ def run_data(graph: Data) -> numpy.ndarray:
     - graph: a PyTorch Geometric Data object.
 
     Returns:
-    - A numpy ndarray of shape (num_nodes, 128).
+    - A trained Node2Vec model.
     """
 
-    # Convert PyG Data to NetworkX graph
-    edge_index = graph.edge_index.numpy()
-    edge_attr = graph.edge_attr.numpy()
-    G_nx = nx.Graph()
-    for i in range(edge_index.shape[1]):
-        u = edge_index[0, i]
-        v = edge_index[1, i]
-        w = edge_attr[i]
-        G_nx.add_edge(u, v, weight=w)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    model = Node2Vec(
+                        edge_index=graph.edge_index,
+                        embedding_dim=128,
+                        walk_length=20,
+                        context_size=10,
+                        walks_per_node=10,
+                        num_negative_samples=1,
+                        p=1.0,
+                        q=1.0,
+                        sparse=True,
+                    ).to(device)
 
-    # Create Node2Vec model
-    node2vec = Node2Vec(
-                        graph=G_nx, 
-                        dimensions=128, 
-                        walk_length=20, 
-                        num_walks=10, 
-                        p=1.0, 
-                        q=1.0, 
-                        weight_key='weight',
-                        workers=os.cpu_count(), 
-                        quiet=True
-                        )
+    loader = model.loader(batch_size=128, shuffle=True)
+    optimizer = torch.optim.SparseAdam(list(model.parameters()), lr=0.01)
 
-    # Fit model
-    model = node2vec.fit(window=10, min_count=1, batch_words=4)
-
-    print("Training completed!")
-
-    # Get embeddings for all nodes
-    embeddings = numpy.zeros((graph.num_nodes, 128))
-
-    for node in G_nx.nodes():
-        embeddings[node] = model.wv[str(node)]
-
-    return embeddings
+    for epoch in range(200):
+        model.train()
+        for pos_rw, neg_rw in loader:
+            optimizer.zero_grad()
+            loss = model.loss(pos_rw.to(device), neg_rw.to(device))
+            loss.backward()
+            optimizer.step()
+    
+    return model
