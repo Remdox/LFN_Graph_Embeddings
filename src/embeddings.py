@@ -1,7 +1,5 @@
 import sys
 import torch
-import numpy as np
-import pandas as pd
 from abc import ABC, abstractmethod
 
 sys.path.append('.')
@@ -69,38 +67,37 @@ class GraphSage(Embedding):
             emb = self.model.embed(node_t)
             if emb.shape[0] == 128 and (len(emb.shape) == 1 or emb.shape[1] != 128):
                 emb = emb.t()
-        return torch.as_tensor(emb.squeeze())
+        return emb.squeeze()
     
     def compute_features(self, graph):
         # Creation of features for each node
         num_nodes = graph.graph_data.num_nodes
-        u_list = graph.graph_data.edge_index[0].numpy()
-        v_list = graph.graph_data.edge_index[1].numpy()
-        weights = graph.graph_data.edge_attr.numpy()
-        feat_data = np.zeros((num_nodes, 3))
+        u_list = graph.graph_data.edge_index[0]
+        v_list = graph.graph_data.edge_index[1]
+        weights = graph.graph_data.edge_attr
+        feat_data = torch.zeros(num_nodes, 3)
 
-        df = pd.DataFrame({'u': u_list, 'v': v_list, 'weight': weights})
-        weights_sum = df.groupby('u')['weight'].sum()
-        weights_max = df.groupby('u')['weight'].max()
-        num_neighbors = df.groupby('u')['v'].nunique()
         # Assigns to each node the following features: sum of weights of the corresponding edges, max weight of the corresponding edges and number of neighbors.
-        for node_id in weights_sum.index:
-            feat_data[node_id, 0] = weights_sum[node_id]
-            feat_data[node_id, 1] = weights_max[node_id]
-            feat_data[node_id, 2] = num_neighbors[node_id]
+        feat_data[:, 0].index_add_(0, u_list, weights)
+        feat_data[:, 1].scatter_reduce_(0, u_list, weights.squeeze(), reduce='amax', include_self=False)
+        ones = torch.ones_like(weights)
+        feat_data[:, 2].index_add_(0, u_list, ones)
+
         # Z-score standardization of the features
-        feat_data = (feat_data - feat_data.mean(axis=0)) / (feat_data.std(axis=0) + 1e-7)
+        mean = feat_data.mean(dim=0)
+        std = feat_data.std(dim=0)
+        feat_data = (feat_data - mean) / (std + 1e-7)
         return feat_data
     
     def update_adjacency(self, edge_index):
-        u_list = edge_index[0].numpy()
-        v_list = edge_index[1].numpy()
+        u_list = edge_index[0].tolist()
+        v_list = edge_index[1].tolist()
         
         internal_adj = self.model.enc.adj_lists
         
         for u, v in zip(u_list, v_list):
-            internal_adj[int(u)].add(int(v))
-            internal_adj[int(v)].add(int(u))
+            internal_adj[u].add(v)
+            internal_adj[v].add(u)
 
         print("Adjacency lists updated!")
 

@@ -3,7 +3,6 @@ import torch.nn as nn
 from torch.nn import init
 from torch.autograd import Variable
 
-import numpy as np
 import random
 from collections import defaultdict
 
@@ -50,20 +49,18 @@ def load_data(graph, feat_data):
     - adj_lists: adjacency list for each pair of nodes.
     """
     num_nodes = graph.num_nodes
-    u_list = graph.edge_index[0].numpy()
-    v_list = graph.edge_index[1].numpy()
+    u_list = graph.edge_index[0]
+    v_list = graph.edge_index[1]
     
     # Creation of labels: label is 1 if the sum of all the weights of a specific node is greater than the median of the weights and is 0 otherwise
-    labels = np.zeros((num_nodes, 1), dtype=np.int64)
-    threshold = np.median(feat_data[:, 0])
-    for i in range(num_nodes):
-        labels[i] = 1 if feat_data[i, 0] > threshold else 0
+    threshold = torch.median(feat_data[:, 0])
+    labels = (feat_data[:, 0] > threshold).long().view(-1, 1)
     
     # Creation of the adjacency lists
     adj_lists = defaultdict(set)
-    for u, v in zip(u_list, v_list):
-        adj_lists[int(u)].add(int(v))
-        adj_lists[int(v)].add(int(u))
+    for u, v in zip(u_list.tolist(), v_list.tolist()):
+        adj_lists[u].add(v)
+        adj_lists[v].add(u)
         
     return labels, adj_lists
 
@@ -79,14 +76,15 @@ def run_data(graph, feat_data):
     Returns:
     - graphsage: trained GraphSage model.
     """
-    np.random.seed(1)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     random.seed(1)
     torch.manual_seed(1)
     labels, adj_lists = load_data(graph, feat_data)
+    labels.to(device)
     num_nodes = feat_data.shape[0]
     num_feat = feat_data.shape[1]
     features = nn.Embedding(num_nodes, num_feat)
-    features.weight = nn.Parameter(torch.FloatTensor(feat_data), requires_grad=False)
+    features.weight = nn.Parameter(torch.FloatTensor(feat_data).to(device), requires_grad=False)
 
     agg1 = MeanAggregator(features, cuda=True)
     enc1 = Encoder(features, num_feat, 128, adj_lists, agg1, gcn=True, cuda=False)
@@ -95,7 +93,7 @@ def run_data(graph, feat_data):
     enc1.num_samples = 10
     enc2.num_samples = 10
 
-    graphsage = SupervisedGraphSage(2, enc2)
+    graphsage = SupervisedGraphSage(2, enc2).to(device)
 
     optimizer = torch.optim.Adam(filter(lambda p : p.requires_grad, graphsage.parameters()), lr=0.01)
     
@@ -103,7 +101,7 @@ def run_data(graph, feat_data):
 
     for batch in range(200):
         batch_nodes = random.sample(train_nodes, min(len(train_nodes), 1024))
-        batch_labels = torch.LongTensor(labels[np.array(batch_nodes)])
+        batch_labels = labels[torch.LongTensor(batch_nodes)].view(-1)
 
         optimizer.zero_grad()
         loss = graphsage.loss(batch_nodes, batch_labels)

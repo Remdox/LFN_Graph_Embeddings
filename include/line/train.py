@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 from .line import Line
 from .utils import AliasSampler
 
@@ -10,15 +9,16 @@ def run_data(graph, total_dim=128, epochs=10, batch_size=4096, initial_lr=0.025)
     num_nodes = data.num_nodes
     dim_per_order = total_dim // 2
     
-    edge_index = data.edge_index.t()
-    weights = data.edge_attr.numpy().flatten()
+    edge_index = data.edge_index.t().to(device)
+    weights = data.edge_attr.view(-1).to(device)
     
     # Positive edge sampler
     edge_sampler = AliasSampler(weights)
-    # Using np.bincount to calculate node degrees
-    node_degrees = np.bincount(data.edge_index[0].numpy(), weights=weights, minlength=num_nodes)
+    # Computation of node degrees
+    node_degrees = torch.zeros(num_nodes, dtype=torch.float32, device=device)
+    node_degrees.index_add_(0, data.edge_index[0], weights)
     # Negative sampler
-    node_sampler = AliasSampler(np.power(node_degrees, 0.75) + 1e-10)
+    node_sampler = AliasSampler(torch.pow(node_degrees, 0.75) + 1e-10)
 
     all_embs = []
     num_batches = edge_index.size(0) // batch_size
