@@ -17,8 +17,6 @@ import embeddings
 from embeddings import GraphSage, Node2Vec, LINE, DVNE
 import models
 from models import SVM, MLP, RandomForest
-import model_utils
-from model_utils import evaluate_AUROC, evaluate_AUPR
 from utils import get_current_time_ms, elapsed_time_ms
 
 RANDOM_SEED = 104

@@ -75,4 +75,4 @@ def predict(model: SVM, X: torch.Tensor) -> torch.Tensor:
         y_pred = model(X)
         y_pred = torch.where(y_pred >= 0, torch.tensor(1.0), torch.tensor(0.0))
     
-    return y_pred
+    return y_pred.squeeze()
