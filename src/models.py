@@ -22,8 +22,9 @@ class Model(ABC):
 
 
 class SVM(Model):
-    def __init__(self):
+    def __init__(self, device):
         self.model = None
+        self.device = device
 
     def train_model(self, X, y):
         self.model = SVMModel(X.shape[1])
@@ -33,8 +34,9 @@ class SVM(Model):
         return predict_svm(self.model, X)
 
 class RandomForest(Model):
-    def __init__(self):
+    def __init__(self, device):
         self.model = None
+        self.device = device
 
     def train_model(self, X, y):
         self.model = xgb.XGBRFClassifier(n_estimators=100, max_depth=10, tree_method='hist', random_state=104)
@@ -46,15 +48,19 @@ class RandomForest(Model):
 
 
 class MLP(torch.nn.Module, Model):
-    def __init__(self, input_dim:int =257, hidden_channels:int =16, lr:float =0.01, weight_decay:float =5e-4):
+    def __init__(self, device, input_dim:int =257, hidden_channels:int =16, lr:float =0.01, weight_decay:float =5e-4, num_epochs:int=200, patience:int=20):
         super().__init__()
         self.lin1 = Linear(input_dim, hidden_channels)
         self.lin2 = Linear(hidden_channels, 2)
+
+        self.to(device)
+
         self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(self.parameters(), lr=lr, weight_decay=weight_decay)
-        self.out = None
-        num_epochs = 200
-        patience = 20
+
+    @property
+    def device(self):
+        return next(self.parameters()).device
 
     def forward(self, X:torch.Tensor):
         X = self.lin1(X)
@@ -64,15 +70,17 @@ class MLP(torch.nn.Module, Model):
         return X
 
     def train_model(self, X:torch.Tensor, Y:torch.Tensor):
+        X, Y = X.to(self.device), Y.to(self.device)
         self.train()
         self.optimizer.zero_grad()
-        self.out = self.forward(X)
-        loss = self.criterion(self.out, Y.long())
+        out = self.forward(X)
+        loss = self.criterion(out, Y.long())
         loss.backward()
         self.optimizer.step()
         return loss.item()
 
     def predict(self, X:torch.Tensor):
+        X = X.to(self.device)
         self.eval()
         with torch.no_grad():
             out = self.forward(X)

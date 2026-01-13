@@ -6,6 +6,9 @@ import time
 import click
 import copy
 from pathlib import Path
+from torchmetrics import MetricCollection
+from torchmetrics.classification import BinaryAUROC, BinaryAveragePrecision
+
 import dataset_utils
 from dataset_utils import Graph
 import pipeline_utils
@@ -35,6 +38,7 @@ def main(data, embed, model):
     torch.manual_seed(RANDOM_SEED)
     random.seed(a=RANDOM_SEED)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    metrics_generator = MetricCollection([BinaryAUROC(), BinaryAveragePrecision()]).to(device)
     negative_sample_ratio = 1 * E_PRED_RATIO
     MLP_num_epochs = 200
     MLP_patience = 20
@@ -58,7 +62,7 @@ def main(data, embed, model):
     if model:
         models = {model: models[model]}
     for name, cls in models.items():
-        models[name] = cls()
+        models[name] = cls(device)
 
     for data_name, dataset in datasets.items():
         print(f"@@@ DATASET: {data_name} @@@")
@@ -128,7 +132,9 @@ def main(data, embed, model):
                     epochs_wout_improvement = 0
                     best_model_weights = copy.deepcopy(mod.state_dict())
                     for epoch in range(1, MLP_num_epochs):
+                        # with torch.autograd.profiler.profile(use_cuda=True) as prof:
                         train_loss = mod.train_model(embedded_train, train_labels)
+                        # print(prof.key_averages().table(sort_by="cuda_time_total", row_limit=10))
 
                         mod.eval()
                         with torch.no_grad():
@@ -161,8 +167,9 @@ def main(data, embed, model):
                 print(f"Finished test of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
 
                 # metrics
-                print(f"AUROC: {evaluate_AUROC(test_labels, pred)}")
-                print(f"AUPR: {evaluate_AUPR(test_labels, pred)}\n")
+                metrics = metrics_generator(pred, test_labels)
+                print(f"AUROC: {metrics['BinaryAUROC']:.4f}")
+                print(f"AUPR: {metrics['BinaryAveragePrecision']:.4f}\n")
                  # GS+MLP
                  # 0.8677982550730319 AUROC
                  # 0.7467608911257131 AURPR

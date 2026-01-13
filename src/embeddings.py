@@ -117,19 +117,22 @@ class DVNE(torch.nn.Module, Embedding):
         self.mu_layer = torch.nn.Linear(hidden_dim, latent_dim)
         self.sigma_layer = torch.nn.Linear(hidden_dim, latent_dim)
 
+        self.to(device)
+
+        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+
         self.anchors = None
         self.positives = None
         self.negatives = None
         self.weights = None
 
-        self.optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
-
         self.mu = None
         self.sigma = None
         self.loss = None
 
-        self.device = device
-        self.to(device)
+    @property
+    def device(self):
+        return next(self.parameters()).device
 
     # structured_negative_sampling cannot be used because the positive edges are shuffled without their attributes, so you then have to recover the right order of weights
     # Here, instead, by fixing an anchor from a positive edges and picking negative edges at random
@@ -153,7 +156,20 @@ class DVNE(torch.nn.Module, Embedding):
                 false_negatives_count += 1
         print(f"False negative in sample: {false_negatives_count} (ratio: {(false_negatives_count/batch_size)})")
 
-    def compute_features(self, graph):
+    def compute_features(self, graph:Graph):
+        """
+        Manually computes features for nodes of a graph.
+        The node features computed are:
+        - sum of weights
+        - maximum weight
+        - number of neighbors
+
+        Parameters:
+        - graph: Graph object containing the graph with its nodes
+
+        Returns:
+        - A torch.tensor object [num_edges x 3] containing the computed features.
+        """
         edge_index = graph.graph_data.edge_index.to(self.device)
         edge_attr = graph.graph_data.edge_attr.to(self.device)
         num_nodes = graph.graph_data.num_nodes
@@ -175,7 +191,8 @@ class DVNE(torch.nn.Module, Embedding):
         return features
 
     def train_embed(self, graph, epochs:int=100):
-        node_features = self.compute_features(graph)
+        dev = next(self.parameters()).device
+        node_features = self.compute_features(graph).to(dev)
         for epoch in range(epochs):
             self.train()
             self.optimizer.zero_grad()
@@ -200,7 +217,7 @@ class DVNE(torch.nn.Module, Embedding):
         sigma = softplus(self.sigma_layer(h))
         return mu, sigma
 
-    def wasserstein_distance_gaussian(self, mu_i, sigma_i, mu_j, sigma_j):
+    def gauss_wasserstein_dist(self, mu_i, sigma_i, mu_j, sigma_j):
         mu_dist = torch.sum((mu_i - mu_j) ** 2, dim=1)
         sigma_dist = torch.sum((sigma_i - sigma_j) ** 2, dim=1)
         return mu_dist + sigma_dist
@@ -210,8 +227,8 @@ class DVNE(torch.nn.Module, Embedding):
         mu_pos, sigma_pos = mu[pos_idx], sigma[pos_idx]
         mu_neg, sigma_neg = mu[neg_idx], sigma[neg_idx]
 
-        dist_positives = self.wasserstein_distance_gaussian(mu_i, sigma_i, mu_pos, sigma_pos)
-        dist_negatives = self.wasserstein_distance_gaussian(mu_i, sigma_i, mu_neg, sigma_neg)
+        dist_positives = self.gauss_wasserstein_dist(mu_i, sigma_i, mu_pos, sigma_pos)
+        dist_negatives = self.gauss_wasserstein_dist(mu_i, sigma_i, mu_neg, sigma_neg)
 
         loss = relu(margin + dist_positives - dist_negatives).mean()
         return loss
