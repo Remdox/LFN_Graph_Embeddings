@@ -39,12 +39,12 @@ class RandomForest(Model):
         self.device = device
 
     def train_model(self, X, y):
-        self.model = xgb.XGBRFClassifier(n_estimators=100, max_depth=10, tree_method='hist', random_state=104)
+        self.model = xgb.XGBRFClassifier(n_estimators=100, max_depth=10, tree_method='hist', device=str(self.device), random_state=104)
         self.model.fit(X.detach(), y.detach())
 
     def predict(self, X):
         pred = self.model.predict(X.detach())
-        return pred
+        return torch.as_tensor(pred, dtype=torch.float32, device=self.device)
 
 
 class MLP(torch.nn.Module, Model):
