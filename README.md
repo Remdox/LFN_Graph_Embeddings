@@ -20,19 +20,30 @@ Table of Contents
    * [Results](#results)
 
 # Introduction
-[Read the full proposal](./reports/first_proposal/first_proposal.pdf).  
-[Read the midterm report](./reports/midterm_report.pdf).
+[Read the first proposal](./reports/first_proposal/first_proposal.pdf).  
+[Read the midterm report](./reports/midterm_report.pdf).  
+[Read the final report](./reports/final_report.pdf).
    
 # Instructions
 ## Requirements
-For the embeddings, we use the following implementations:
-* [Node2Vec](https://github.com/palash1992/GEM);
-* [LINE](https://github.com/tangjianpku/LINE);
-* [Deep Variational Network Embedding in Wasserstein Space](https://github.com/Lakshya-99/Deep_Variational_Network_Embedding/tree/master);
-* [GraphSage](https://github.com/williamleif/GraphSAGE).
+### Dependencies
+See [the dedicated file](./requirements.txt) and install the dependencies inside a virtual environment.
+Additionaly, the package torch-cluster needs to be installed in order to use Node2Vec:
+```
+pip install torch-cluster
+```
 
-You can run the [setup file](./setup.py) in a venv environment for automatic installation.
-**HARDWARE**
+The program has been tested on GPU using these additional packages with specific versions:
+* Pytorch 2.8.0, CUDA 1.28
+* cupy-cuda12x
+* torch-cluster needs to be reinstalled with its gpu-adiacent version:
+   ```
+   pip install torch_cluster -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
+   ```
+### Hardware
+The program runs on a single NVIDIA GPU, if detected; otherwise, it can run on cpu with good performance for small and medium-sized datasets.
+
+For the few who have access to the cluster "Blade", a [.def file](./LFN_container_gpu.def) is provided so that you can build the container starting from an already existing image cv-ml-torch.sif obtainable from inside the cluster. Before building, please change the path of the localimage in the .def file.
 
 ## Running the project
 * Extract the archive [./datasets/original_dataset.zip](original_dataset.zip) containing the datasets we used.
@@ -44,6 +55,15 @@ You can run the [setup file](./setup.py) in a venv environment for automatic ins
     ```python
     python embeddings_pipeline.py
     ```
+   You can also choose to run the pipeline with a single dataset, as well as a single embedding algorithm and a single downstream model. One example:
+   ```python
+   python embeddings_pipeline.py --data datasets/processed_datasets/Bio_grid_fission_yeast.csv
+   ```
+
+   Or even:
+   ```python
+   python embeddings_pipeline.py --data Bio_grid_fission_yeast --embed DVNE --model MLP
+   ```
    
 # Datasets and project structure
 9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the references for each dataset in the [midterm report](./reports/midterm_report.pdf).
@@ -69,6 +89,10 @@ LFN_Graph_Embeddings/
 ├── datasets/
 │   └── datasets_info.csv
 │   └── original_datasets.zip
+└── include/
+│   └── graphsage/
+│   └── line/
+│   └── node2vec/
 └── reports/
 │   └── final_report/
 │   |   └── final_report.pdf
@@ -84,19 +108,22 @@ LFN_Graph_Embeddings/
 │   │   └──   ...
 └── src/
 │   └── datasets_preprocessing.py
-│   └── emebeddings_pipeline.py
+│   └── dataset_utils.py
+│   └── embeddings.py
+│   └── models.py
+│   └── pipeline.py
+│   └── pipeline_utils.py
+│   └── utils.py
 └── README-md
 ```
-Where The [datasets_info.csv](./datasets/datasets_info.csv) file provides the fields considered for each of the datasets used.
-
-# Code
-The pipeline is:
-## 1.Datasets preprocessing
-## 2.Setting up the link prediction task
-## 3.Extracting node embeddings from the data
-## 4.Prediction using the embeddings
-## 5.Metrics and Experiments
-## 6.Output
+Where The [datasets_info.csv](./datasets/datasets_info.csv) file provides the fields considered for each of the datasets used. If a new dataset is included, this file has to be correctly updated before running the program.
 
 # Results
 See the [final report](./reports/final_report/final_report.pdf).
+
+# Credits
+We thank the creators of the following implementations (see the [include folder](./include/) inside the project):
+* [Node2Vec](https://github.com/palash1992/GEM);
+* [LINE](https://github.com/tangjianpku/LINE);
+* [Deep Variational Network Embedding in Wasserstein Space](https://github.com/Lakshya-99/Deep_Variational_Network_Embedding/tree/master);
+* [GraphSage](https://github.com/williamleif/GraphSAGE).

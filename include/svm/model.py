@@ -5,9 +5,10 @@ import torch.optim as optim
 
 class SVM(nn.Module):
 
-    def __init__(self, input_size):
+    def __init__(self, input_size, device):
         super(SVM, self).__init__()
         self.linear = nn.Linear(input_size, 1)
+        self.to(device)
 
     def forward(self, x):
         return self.linear(x)
@@ -24,7 +25,8 @@ def hinge_loss(y_true: torch.Tensor, y_pred: torch.Tensor) -> torch.Tensor:
     Returns:
     - Hinge loss value
     """
-
+    y_true = y_true.view(-1)
+    y_pred = y_pred.view(-1)
     return torch.mean(torch.clamp(1 - y_true * y_pred, min=0))
 
 

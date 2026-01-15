@@ -27,7 +27,8 @@ class SVM(Model):
         self.device = device
 
     def train_model(self, X, y):
-        self.model = SVMModel(X.shape[1])
+        X, y = X.to(self.device), y.to(self.device)
+        self.model = SVMModel(X.shape[1], self.device)
         self.model = train_svm(self.model, X, y)
 
     def predict(self, X):

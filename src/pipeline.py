@@ -109,6 +109,10 @@ def main(data, embed, model):
         if embed_methods.get('GraphSage') is not None:
             embed_methods['GraphSage'].update_features(embed_methods['GraphSage'].compute_features(dataset))
             embed_methods['GraphSage'].update_adjacency(G_pred.graph_data.edge_index)
+            embed_methods['GraphSage'].compute_all_embeddings_in_batch(G_pred)
+
+        if embed_methods.get('Node2Vec') is not None:
+            embed_methods['Node2Vec'].compute_all_embeddings_in_batch(G_pred)
 
 
         for method_name, method in embed_methods.items():

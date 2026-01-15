@@ -51,7 +51,7 @@ def run_data(graph, total_dim=128, epochs=10, batch_size=4096, initial_lr=0.025)
                 u = edge_index[idx_batch, 0]
                 v = edge_index[idx_batch, 1]
                 # Extraction of negatives
-                negs = s_negs[start*5:end*5].view(batch_size, 5)
+                negs = s_negs[start*5:end*5].view(batch_size, 5).to(device)
 
                 optimizer.zero_grad()
                 loss = model(u, v, negs)

@@ -1,0 +1,26 @@
+BootStrap: localimage
+From: /path/to/cv-ml-torch.sif
+
+%post
+   uv pip install --no-cache torch_cluster -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
+   uv pip install --no-cache ultralytics
+   uv pip install --no-cache torch_geometric
+   uv pip install --no-cache click
+   uv pip install --no-cache gensim
+   uv pip install --no-cache node2vec
+   uv pip install --no-cache xgboost
+   uv pip install --no-cache scikit-learn
+   uv pip install --no-cache torchmetrics
+   uv pip install --no-cache cupy-cuda12x
+
+   uv cache clean
+
+%environment
+   export LC_ALL=C
+
+%runscript
+
+%labels
+   Author marco
+
+

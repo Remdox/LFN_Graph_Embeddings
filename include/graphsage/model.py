@@ -33,7 +33,7 @@ class SupervisedGraphSage(nn.Module):
         return self.xent(scores, labels.squeeze())
     
     def embed(self, nodes):
-        return self.enc(nodes)
+        return self.enc(nodes).t()
 
 def load_data(graph, feat_data):
     """
@@ -64,7 +64,7 @@ def load_data(graph, feat_data):
         
     return labels, adj_lists
 
-def run_data(graph, feat_data):
+def run_data(graph, feat_data, device):
     """
     Loads the graph data, trains the GraphSage model and produces the trained GraphSage model.
 
@@ -76,7 +76,9 @@ def run_data(graph, feat_data):
     Returns:
     - graphsage: trained GraphSage model.
     """
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    using_cuda = True
+    if device.type == 'cpu':
+        using_cuda = False
     random.seed(1)
     torch.manual_seed(1)
     labels, adj_lists = load_data(graph, feat_data)
@@ -84,12 +86,12 @@ def run_data(graph, feat_data):
     num_nodes = feat_data.shape[0]
     num_feat = feat_data.shape[1]
     features = nn.Embedding(num_nodes, num_feat)
-    features.weight = nn.Parameter(torch.FloatTensor(feat_data).to(device), requires_grad=False)
+    features.weight = nn.Parameter(feat_data.to(device), requires_grad=False)
 
-    agg1 = MeanAggregator(features, cuda=True)
-    enc1 = Encoder(features, num_feat, 128, adj_lists, agg1, gcn=True, cuda=False)
-    agg2 = MeanAggregator(lambda nodes : enc1(nodes).t(), cuda=False)
-    enc2 = Encoder(lambda nodes : enc1(nodes), enc1.embed_dim, 128, adj_lists, agg2, base_model=enc1, gcn=True, cuda=False)
+    agg1 = MeanAggregator(features, cuda=using_cuda)
+    enc1 = Encoder(features, num_feat, 128, adj_lists, agg1, gcn=True, cuda=using_cuda)
+    agg2 = MeanAggregator(lambda nodes : enc1(nodes).t(), cuda=using_cuda)
+    enc2 = Encoder(lambda nodes : enc1(nodes), enc1.embed_dim, 128, adj_lists, agg2, base_model=enc1, gcn=True, cuda=using_cuda)
     enc1.num_samples = 10
     enc2.num_samples = 10
 
