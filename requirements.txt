@@ -1,7 +1,6 @@
 torch=2.8.0
 
 torch_geometric
-node2vec
 
 numpy
 pandas

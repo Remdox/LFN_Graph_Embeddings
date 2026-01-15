@@ -114,7 +114,8 @@ def main(data, embed, model):
         if embed_methods.get('Node2Vec') is not None:
             embed_methods['Node2Vec'].compute_all_embeddings_in_batch(G_pred)
 
-
+        # for validation
+        auroc_results = dict()
         for method_name, method in embed_methods.items():
             print(f"---- Embedding edges with method: {method_name} ----")
             start_time = get_current_time_ms()
@@ -125,8 +126,8 @@ def main(data, embed, model):
             print(f"{method_name} embeddings done after {elapsed_time_ms(start_time, end_time)/1000} s")
 
             # train with the embedding of the training set
-            start_time = get_current_time_ms()
             for name, mod in models.items():
+                start_time = get_current_time_ms()
                 print(f"---- Train, validation, test of model {name} ----")
                 print(f"Training model {name}")
                 if name == "MLP":
@@ -163,22 +164,45 @@ def main(data, embed, model):
                 print(f"Finished training of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
 
                 start_time = get_current_time_ms()
-                print(f"Testing model {name}")
-                pred = mod.predict(embedded_test)
+                print(f"Testing model {name} for validation")
+                pred = mod.predict(embedded_val)
                 end_time = get_current_time_ms()
                 print(f"Finished test of {name} after {elapsed_time_ms(start_time, end_time)/1000} s")
 
                 # metrics
-                metrics = metrics_generator(pred, test_labels)
+                metrics = metrics_generator(pred, val_labels)
+                auroc_results[name] = metrics['BinaryAUROC']
                 print(f"AUROC: {metrics['BinaryAUROC']:.4f}")
                 print(f"AUPR: {metrics['BinaryAveragePrecision']:.4f}\n")
-                 # GS+MLP
-                 # 0.8677982550730319 AUROC
-                 # 0.7467608911257131 AURPR
 
-                 # N2V+MLP
-                 # 0.8974720615625918 AUROC
-                 # 0.8209333103906062 AURPR
+            # SELECTION OF THE BEST MODEL BASED ON AUROC
+            best_model_name = max(auroc_results, key=auroc_results.get)
+            best_model = models[best_model_name]
+            print(f"Best model for dataset {data_name} with embedding {method_name} is {best_model_name} with AUROC {auroc_results[best_model_name]:.4f}\n\n")
+
+            if name != "MLP":
+                # RE-TRAINING ON TRAIN + VAL SET
+                print(f"---- Retraining best model {best_model_name} on train + val ----")
+                embedded_train_val = torch.cat([embedded_train, embedded_val], dim=0)
+                train_val_labels   = torch.cat([train_labels, val_labels], dim=0)
+
+                start_time = get_current_time_ms()
+                best_model.train_model(embedded_train_val, train_val_labels)
+                end_time = get_current_time_ms()
+                print(f"Finished retraining of {best_model_name} after {elapsed_time_ms(start_time, end_time)/1000} s")
+
+            # TESTING ON TEST SET
+            start_time = get_current_time_ms()
+            print(f"Testing best model {best_model_name} on test set")
+            pred = best_model.predict(embedded_test)
+            end_time = get_current_time_ms()
+            print(f"Finished test of {best_model_name} after {elapsed_time_ms(start_time, end_time)/1000} s")
+
+            # metrics
+            metrics = metrics_generator(pred, test_labels)
+            auroc_results[name] = metrics['BinaryAUROC']
+            print(f"AUROC: {metrics['BinaryAUROC']:.4f}")
+            print(f"AUPR: {metrics['BinaryAveragePrecision']:.4f}\n")
 
 
 if __name__ == "__main__":
