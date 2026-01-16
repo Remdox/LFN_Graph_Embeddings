@@ -1,33 +1,60 @@
 \section{Results}
-Table \ref{tab:metrics} reports the AUROC and AUPR values of the best performing classifier for each embedding technique across all datasets. \\
-It can be seen that Node2Vec outperforms the other embedding techniques across the majority of the datasets; however DVNE shows competitive results, surpassing Node2Vec in datasets such as Hong Kong and Italian Covid-19 Retweet Network. \\
-Instead, LINE proves to be the worst performing embedding method in almost all scenarios, probably due to a low number of epochs for the training (necessary to maintain a feasible trade-off between performance 
-and computational time/memory complexity) or its limitation in capturing only local (first and second order) proximity, which may fail to represent the global structure of complex and sparse networks. \\
-GraphSage and DVNE demonstrate a stable performance, each of them showing consistency across all categories of datasets. This suggests that these methods are more robust to variations in graph topology. \\
-Two notable extremes are the Italian Covid-19 Retweet Network and Deezer. For the first one, all the embedding methods achieve high values of AUPR and AUROC (with the lowest value of AUROC being 0,9202 for GraphSage), 
-indicating a clear community network where links are easily predictable; while for the second one, all embedding techniques show low values, especially LINE, which reaches an AUPR value of 0,3704 
-(the lowest value of the entire table), likely due to the high noise or sparse connectivity of the graph. \\
-For what concerns classifiers, Random Forest reaches high performance across most embedding techniques and dataset types. Specifically, it is the best performing model for Node2Vec on road networks and for GraphSage in almost
-all scenarios. On the other hand, MLP remains highly effective when paired with DVNE and with Node2Vec on social networks.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/Training_time.png}
+\caption{Training time comparison. The x-axis represents the datasets through their size \(|V| + 0.8 * |E|\), which approximates the total number of nodes and edges used during training.}
+\label{fig:training_time}
+\end{figure}
+Figure \ref{fig:training_time} illustrates the training times for each embedding method across the various datasets.
+\\
+As expected, Node2Vec requires the longest training time, particularly for larger datasets, due to its reliance on random walks.
+On the other hand, DVNE demonstrates the fastest training times.
+
+
 
 \begin{sidewaystable}
     \centering
-    \begin{tabular}{m{3cm}cccccccccccc}
+    \begin{tabular}{>{\centering}m{4cm} @{\hspace{0.75cm}} >{\centering}m{1cm}cc @{\hspace{0.75cm}} >{\centering}m{1cm}cc @{\hspace{0.75cm}} >{\centering}m{1cm}cc @{\hspace{0.75cm}} >{\centering}m{1cm}cc}
         \toprule
         \multirow{2}{*}{\textbf{Dataset}} & \multicolumn{3}{c}{\textbf{Node2Vec}} & \multicolumn{3}{c}{\textbf{LINE}}  & \multicolumn{3}{c}{\textbf{DVNE}} & \multicolumn{3}{c}{\textbf{GraphSage}} \\
                                           & Best Model & AUROC & AUPR             & Best Model & AUROC & AUPR          & Best Model & AUROC & AUPR         & Best Model & AUROC & AUPR \\
         \midrule
-        Pennsylvania & RF & 0,8369 & 0,7717 & MLP & 0,5770 & 0,5840 & MLP & 0,7959 & 0,7710 & RF & 0,6958 & 0,6286 \\
-        Padua & RF & 0,8973 & 0,8551 & RF & 0,5805 & 0,5492 & RF & 0,7761 & 0,7121 & RF & 0,8083 & 0,7343 \\
-        Hong Kong & RF & 0,8278 & 0,7649 & MLP & 0,6157 & 0,6219 & MLP & 0,8694 & 0,8464 & RF & 0,8365 & 0,7643 \\
-        Italian Covid-19 Retweet Network & MLP & 0,9596 & 0,9666 & MLP & 0,9513 & 0,9575 & MLP & 0,9716 & 0,9756 & RF & 0,9202 & 0,8808 \\
-        Deezer & MLP & 0,7191 & 0,5652 & RF & 0,5415 & 0,3704 & MLP & 0,6888 & 0,5480 & RF & 0,5769 & 0,3986 \\
-        GitHub Developers & MLP & 0,9225 & 0,8865 & RF & 0,6932 & 0,5578 & MLP & 0,9063 & 0,8540 & MLP & 0,7239 & 0,4947 \\
-        Mus Musculus Protein Interaction & RF & 0,8213 & 0,6877 & RF & 0,7500 & 0,6121 & RF & 0,8091 & 0,6649 & RF & 0,7517 & 0,5762 \\
-        Saccharomyces cerevisiae Protein Interaction & RF & 0,8805 & 0,8130 & RF & 0,8005 & 0,7153 & RF & 0,8601 & 0,7491 & RF & 0,8411 & 0,7177 \\
-        Bio-grid-fission-yeast & MLP & 0,8754 & 0,7962 & MLP & 0,7773 & 0,6829 & RF & 0,8636 & 0,7541 & MLP & 0,8622 & 0,7764 \\
+        \textbf{Pennsylvania} & RF & \textbf{0,8369} & \textbf{0,7717} & MLP & 0,5770 & 0,5840 & MLP & 0,7959 & 0,7710 & RF & 0,6958 & 0,6286 \\
+        \textbf{Padua} & RF & \textbf{0,8973} & \textbf{0,8551} & RF & 0,5805 & 0,5492 & RF & 0,7761 & 0,7121 & RF & 0,8083 & 0,7343 \\
+        \textbf{Hong Kong} & RF & 0,8278 & 0,7649 & MLP & 0,6157 & 0,6219 & MLP & \textbf{0,8694} & \textbf{0,8464} & RF & 0,8365 & 0,7643 \\
+        \midrule
+        \textbf{Italian Covid-19 Retweet Network} & MLP & 0,9596 & 0,9666 & MLP & 0,9513 & 0,9575 & MLP & \textbf{0,9716} & \textbf{0,9756} & RF & 0,9202 & 0,8808 \\
+        \textbf{Deezer} & MLP & \textbf{0,7191} & \textbf{0,5652} & RF & 0,5415 & 0,3704 & MLP & 0,6888 & 0,5480 & RF & 0,5769 & 0,3986 \\
+        \textbf{GitHub Developers} & MLP & \textbf{0,9225} & \textbf{0,8865} & RF & 0,6932 & 0,5578 & MLP & 0,9063 & 0,8540 & MLP & 0,7239 & 0,4947 \\
+        \midrule
+        \textbf{Mus Musculus Protein Interaction} & RF & \textbf{0,8213} & \textbf{0,6877} & RF & 0,7500 & 0,6121 & RF & 0,8091 & 0,6649 & RF & 0,7517 & 0,5762 \\
+        \textbf{Saccharomyces cerevisiae Protein Interaction} & RF & \textbf{0,8805} & \textbf{0,8130} & RF & 0,8005 & 0,7153 & RF & 0,8601 & 0,7491 & RF & 0,8411 & 0,7177 \\
+        \textbf{Bio-grid-fission-yeast} & MLP & \textbf{0,8754} & \textbf{0,7962} & MLP & 0,7773 & 0,6829 & RF & 0,8636 & 0,7541 & MLP & 0,8622 & 0,7764 \\
         \bottomrule
     \end{tabular}
-\caption{AUROC and AUPR values for the embedding methods}
+\caption{AUROC and AUPR values for the embedding methods.}
 \label{tab:metrics}
 \end{sidewaystable}
+
+Table \ref{tab:metrics} reports the AUROC and AUPR values of the best performing classifier for each embedding technique across all datasets. 
+\\
+It can be seen that Node2Vec outperforms the other embedding techniques across the majority of the datasets; however DVNE shows competitive results, surpassing Node2Vec in datasets such as Hong Kong and Italian Covid-19 Retweet Network. 
+\\
+Instead, LINE proves to be the worst performing embedding method in almost all scenarios, probably due to a low number of epochs for the training (necessary to maintain a feasible trade-off between performance and computational time/memory complexity) or its limitation in capturing only local (first and second order) proximity, which may fail to represent the global structure of complex and sparse networks. 
+\\
+GraphSage and DVNE demonstrate a stable performance, each of them showing consistency across all categories of datasets. 
+This suggests that these methods are more robust to variations in graph topology. 
+\\
+Two notable extremes are the Italian Covid-19 Retweet Network and Deezer. 
+For the first one, all the embedding methods achieve high values of AUPR and AUROC (with the lowest value of AUROC being 0,9202 for GraphSage), indicating a clear community network where links are easily predictable; while for the second one, all embedding techniques show low values, especially LINE, which reaches an AUPR value of 0,3704 (the lowest value of the entire table), likely due to the high noise or sparse connectivity of the graph. 
+\\
+For what concerns classifiers, RF reaches high performance across most embedding techniques and dataset types. 
+Specifically, it is the best performing model for Node2Vec on road networks and for GraphSage in almost all scenarios. 
+On the other hand, MLP remains highly effective when paired with DVNE and with Node2Vec on social networks.
+\\\newline
+A complete overview of the training times and results can be found in the GitHub repository of the project \cite{ProjectRepo}.
+
+
+
+Da fare notare per DVNE che nel paper originale è stato usato solo per dataset più piccoli del nostro dataset più piccolo, e che la sua velocità permette di scalare decentemente
+

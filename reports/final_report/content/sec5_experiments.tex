@@ -1,4 +1,10 @@
 \section{Experiments}
+In this section, the experimental setup used to evaluate the performance of the selected graph embedding methods for the link prediction task is described.
+The various steps of the pipeline are illustrated, including dataset preprocessing, data splitting, metrics used for evaluation, implementation details of the embedding methods and classifiers, and hardware specifications.
+\\
+The code used for the experiments is available in the GitHub repository of the project \cite{ProjectRepo}.
+
+\subsection{Pipeline}
 The link prediction task requires a sample of edges from the graph (positive edges) and a sample of edges from the complement graph (negative edges, in this case, do not include self-loops). 
 Consequently, each dataset is partitioned as follows.
 \\
@@ -22,6 +28,19 @@ For each edge $(u,v)$, its corresponding embedded representation is constructed 
 \\\newline
 The split used in this study is: (from E) $80\%$ for $E_{\text{embed}}$ and $20\%$  for $E_{\text{pred}}$; (from $E_{\text{pred}}$) $60\%$ for $E_{\text{train}}$, $20\%$  for $E_{\text{val}}$ and $20\%$  for $E_{\text{test}}$.
 
+\subsection{Dataset preprocessing}
+A preprocessing pipeline is utilized in which all datasets are converted into CSV files and only the useful features are extracted, if present.
+\\\newline
+Initially, all the datasets were manually converted to CSV files, as some of them were not directly available in this format.
+Subsequently, a Python script was implemented to automate the following preprocessing of the datasets.
+Undirected edges $(u, v)$ are represented using a pair of directed edges $(u, v)$ and $(v, u)$.
+Unweighted datasets are represented as having a uniform weight of 1.0 for all edges. 
+Finally, the node IDs are mapped to numeric consecutive IDs, with the sequence beginning at 0.
+\\\newline
+In regard to the negative edges, it was necessary to associate them with weights.
+To achieve this, the weights of the negative edges were sampled from the weights of the positive edges. 
+This process was implemented to simulate the distribution of the weights of the positive edges.
+
 \subsection{Metrics}
 Two metrics that are generally used for link prediction are the Area Under the Receiver Operating Characteristic curve (AUROC), and the Area Under the Precision-Recall curve (AUPR). 
 AUROC is historically considered the primary performance metric used to evaluate the performances of link prediction methods \cite{Kalyani2025}. 
@@ -36,34 +55,42 @@ Similarly, an AUPR value of 1 indicates perfect precision and recall, whereas a 
 For the validation phase, the AUROC metric is used to select the best model, while for the final evaluation both AUROC and AUPR are reported.
 
 \subsection{Embedding and classifiers implementation}
-In regard to the implementation of the embedding techniques mentioned in Sec \ref{sec:embedding}, the following implementations will be adopted:  \cite{Node2VecImpl} for Node2Vec, \cite{LINEImpl} for LINE, \cite{DVNEImpl} for DVNE, \cite{GraphSageImpl} for GraphSage. 
-Depending on specific needs, some of these could be modified or used as an inspiration for different implementations. 
-In particular, DVNE was not evaluated on directed graphs in the original work \cite{DVNE}, meaning it may be necessary to explore adaptations for this setting.
-If no satisfactory solution is found, DVNE will be restricted only for undirected graphs to mantain a fair comparison.
-
+Before describing the specific implementations used for the embedding techniques and classifiers, it is important to point out that all implementations have been adapted to run on a GPU.
+\\\newline
+In regard to the implementation of the embedding techniques mentioned in Sec \ref{sec:embedding}, the following implementations have been adopted and modified as needed.
 \begin{itemize}
-    \item Node2Vec \cite{Node2VecImpl}
-    \item LINE \cite{LINEImpl}: the original implementation was optimized for computational efficiency and training stability (for example, using sparse embeddings, SparseAdam optimizer and Batch Matrix Multiplication). 
+    \item \textbf{Node2Vec} \cite{Node2VecImpl1, Node2VecImpl2} The implementation used the following hyperparameters: 
+    walk length = 20, 
+    context size for positive samples = 10, 
+    walks per node = 10, 
+    number of negative samples for each positive sample = 1, 
+    p = 1.0, 
+    q = 1.0.
+    \item \textbf{LINE} \cite{LINEImpl} The original implementation was optimized for computational efficiency and training stability (for example, using sparse embeddings, SparseAdam optimizer and Batch Matrix Multiplication). 
     In addition, a linear learning rate decay was integrated into the training process. 
     At last, the output generation was modified. 
     In fact, the embeddings for first-order and second-order proximity were trained separately, concatenated into a single representation, and then L2-normalized.
-    \item DVNE \cite{DVNEImpl}: this implementation has been severely rewritten for adapting it to our link prediction pipeline and to make it more similar to the original paper.
+    \item \textbf{DVNE} \cite{DVNEImpl} The implementation has been severely rewritten for adapting it to our link prediction pipeline and to make it more similar to the original paper.
     There are also some changes which resulted in the model being more robust, in particular: the use of log-scaled wasserstein distances, the manual computation of features for the nodes during the training process and using z-score for their standardization. 
     Also a fast approximated method of picking negatives is used for picking the triplets needed in the training process.
-    \item GraphSage \cite{GraphSageImpl}: the implementation was modified to support a Graph object as input instead of the original text-based format. 
+    In the original paper, DVNE was only tested on undirected graphs, while in this work it has been applied to both directed and undirected graphs without any specific adaptation.
+    \item \textbf{GraphSage} \cite{GraphSageImpl} The implementation was modified to support a Graph object as input instead of the original text-based format. 
     In particular, two functions were integrated to generate node features and training labels directly from the graph topology.
     In the end, the training process was adjusted to return the trained model.
 \end{itemize}
-
-classifiers
+In regard to the implementation of the classifiers mentioned in Sec \ref{sec:linkprediction}, the following implementations have been adopted.
 \begin{itemize}
-    \item SVM
-    \item MLP: simple model using just 1 layer with 16 hidden channels, cross entropy loss and Adam optimizer.
-    \item RandomForest: for this classifier was used the XGBRFClassifier implementation. 
+    \item \textbf{SVM} Model with regularization parameter 0.01, trained using hinge loss and L2 regularization.
+    \item \textbf{MLP} Simple model using 1 layer with 16 hidden channels, cross entropy loss and Adam optimizer.
+    In the case of this particular classifier, the decision was made to employ the validation set for implementing early stopping. 
+    Consequently, the model does not go through retraining on the union of the training and validation sets after the validation process.
+    \item \textbf{RF} XGBRFClassifier \cite{RFImpl}. 
     This model integrates the Random Forest algorithm within the XGBoost framework, utilizing the histogram-based tree method (hist) to accelerate training on the GPU.
 \end{itemize}
 
-\subsection{Experimental setup}
-The experiments will be conducted using the DEI cluster \emph{"Blade"}.
+\subsection{Hardware specifications}
+The experiments have been conducted using the DEI cluster \emph{"Blade"}.
 The specifications for the nodes of the cluster are available in the open documentation \cite{ClusterDEI}.
-More information about the project's memory usage and runtime will be available in the final report.
+\\
+The experiments utilized a NVIDIA RTX 3090 as the GPU. 
+The number of CPUs per task was two, and the total memory requirement was 5.44 GB.

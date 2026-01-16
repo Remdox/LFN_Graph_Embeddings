@@ -123,7 +123,7 @@ See the [final report](./reports/final_report/final_report.pdf).
 
 # Credits
 We thank the creators of the following implementations (see the [include folder](./include/) inside the project):
-* [Node2Vec](https://github.com/palash1992/GEM);
+* [Node2Vec](https://github.com/pyg-team/pytorch_geometric);
 * [LINE](https://github.com/tangjianpku/LINE);
 * [Deep Variational Network Embedding in Wasserstein Space](https://github.com/Lakshya-99/Deep_Variational_Network_Embedding/tree/master);
 * [GraphSage](https://github.com/williamleif/GraphSAGE).
