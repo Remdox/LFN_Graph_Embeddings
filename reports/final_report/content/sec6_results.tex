@@ -9,6 +9,17 @@ Figure \ref{fig:training_time} illustrates the training times for each embedding
 \\
 As expected, Node2Vec requires the longest training time, particularly for larger datasets, due to its reliance on random walks.
 On the other hand, DVNE demonstrates the fastest training times.
+\\
+As is illustrated, the time required for training is not uniform. 
+This phenomenon may be attributed to the influence of two factors: the size of the graph and its internal structure.
+\\ 
+In fact, Node2vec has been observed to record peaks for social networks (GitHub Developers) and valleys for biological networks (Mus Musculus Protein Interaction).
+\\
+In contrast, LINE appears to exhibit peaks on biological networks, including those of the Mus Musculus Protein Interaction and Saccharomyces cerevisiae Protein Interaction.
+\\
+GraphSage reveals a notable peak for Deezer and valleys for road networks.
+\\\newline
+
 
 \begin{table}[ht!]
     \centering
@@ -73,8 +84,3 @@ Specifically, it is the best performing model for Node2Vec on road networks and 
 On the other hand, MLP remains highly effective when paired with DVNE and with Node2Vec on social networks.
 \\\newline
 A complete overview of the training times and results can be found in the GitHub repository of the project \cite{ProjectRepo}.
-
-
-
-Da fare notare per DVNE che nel paper originale è stato usato solo per dataset più piccoli del nostro dataset più piccolo, e che la sua velocità permette di scalare decentemente
-
