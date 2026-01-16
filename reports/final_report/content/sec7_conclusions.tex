@@ -1,5 +1,21 @@
 \section{Conclusions}
-...
 
-
-Overall, the training times for all embedding methods increase with the size of the datasets, although the internal structure of the graphs also plays a significant role.
+Graph embedding addresses the fundamental challenge of representing complex relational data, structured as graphs or networks, in a format suitable for machine learning. 
+Traditional machine learning models require fixed-size numerical vectors as input, but graphs are inherently non-Euclidean.
+The core problem is how to map nodes into a low-dimensional continuous vector space while preserving essential structural and semantic properties.
+\\\newline
+This study has presented an empirical evaluation of four graph embedding methods (Node2Vec, LINE, DVNE, and GraphSage) for the task of link prediction guided by two principal criteria: adaptability (performance across different graph types) and scalability (computational efficiency). This study utilizes a systematic experimentation approach on nine distinct datasets, encompassing road, social, and biological networks.
+\\\newline
+Adaptability was examined in relation to performance on datasets. 
+A general absence of statistically significant influence was detected with respect to the type of graph; however, performance appears to be contingent upon the specific dataset under consideration. 
+Consequently, it would be worthwhile to examine the topologies of these datasets to ascertain whether a correlation exists.
+\\
+Furthermore, even if the Node2Vec embedding method was identified as the most effective approach, it is important to note that the absence of substantial node features in both DVNE and GraphSage may have limited their performance.
+It would be worthwhile to ascertain whether there are any significant features that can be adapted to multiple datasets.
+\\\newline
+The scalability of the embedding methods has been examined in terms of the time required for training.
+A general trend indicates that the training times for all embedding methods increase with the size of the datasets. 
+However, the internal structure of the graphs  appears to play a significant role.
+\\\newline
+It has been confirmed that no single embedding method is universally superior. 
+Node2Vec excels when resources are available, whereas DVNE and GraphSage offer better scalability with only a modest sacrifice in performance, making them preferable for larger graphs or time-sensitive applications. 

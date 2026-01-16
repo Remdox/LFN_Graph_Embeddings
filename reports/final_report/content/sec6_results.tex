@@ -1,13 +1,15 @@
 \section{Results}
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.8\textwidth]{assets/Training_time.png}
+\includegraphics[width=0.7\textwidth]{assets/Training_time.png}
 \caption{Training time comparison. The x-axis represents the datasets through their size \(|V| + 0.8 * |E|\), which approximates the total number of nodes and edges used during training.}
 \label{fig:training_time}
 \end{figure}
 Figure \ref{fig:training_time} illustrates the training times for each embedding method across the various datasets.
 \\
 As expected, Node2Vec requires the longest training time, particularly for larger datasets, due to its reliance on random walks.
+It exhibits training times that are an order of magnitude greater than those of the other methods.
+\\
 On the other hand, DVNE demonstrates the fastest training times.
 \\
 As is illustrated, the time required for training is not uniform. 
