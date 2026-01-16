@@ -2,7 +2,7 @@ import torch
 
 class AliasSampler:
     def __init__(self, weights):
-        # Using NumPy arrays instead of dictionaries
+        # Using torch tensors instead of dictionaries
         n = len(weights)
         self.prob = torch.zeros(n, dtype=torch.float32)
         self.alias = torch.zeros(n, dtype=torch.long)
