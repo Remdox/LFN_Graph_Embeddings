@@ -227,6 +227,7 @@ class DVNE(torch.nn.Module, Embedding):
         - sum of weights
         - maximum weight
         - number of neighbors
+        - pagerank score
 
         Parameters:
         - graph: Graph object containing the graph with its nodes
@@ -313,11 +314,13 @@ class DVNE(torch.nn.Module, Embedding):
         parameters:
         - mu: mean vectors for all nodes
         - sigma: variance vectors for all nodes
-        - mu_j: mean of the second distribution
-        - sigma_j: standard deviation of the second distribution
+        - pos_idx: indices of the positive end of the edge starting from the anchor
+        - neg_idx: indices of the negative end of the edge starting from the anchor
+
+        Note: the margin is adjusted for log scale
 
         Returns:
-        - a torch.Tensor representing the average loss for the current batch
+        - a torch.Tensor representing the loss
         """
         mu_anchors, sigma_anchors = mu[self.anchors], sigma[self.anchors]
         mu_pos, sigma_pos = mu[pos_idx], sigma[pos_idx]
@@ -326,22 +329,15 @@ class DVNE(torch.nn.Module, Embedding):
         dist_positives = self.gauss_wasserstein_dist(mu_anchors, sigma_anchors, mu_pos, sigma_pos)
         dist_negatives = self.gauss_wasserstein_dist(mu_anchors, sigma_anchors, mu_neg, sigma_neg)
 
-        # if self.epoch % 10 == 0:
-        #     print(f"  > Dist Pos (Mean): {dist_positives.mean().item():.4f}")
-        #     print(f"  > Dist Neg (Mean): {dist_negatives.mean().item():.4f}")
-        #     print(f"  > Active Constraints: {(dist_positives + margin > dist_negatives).float().mean().item()*100:.1f}%")
-        # loss = relu(margin+dist_positives-dist_negatives).mean()
-        # return loss
-
         log_dist_pos = torch.log1p(dist_positives)
         log_dist_neg = torch.log1p(dist_negatives)
 
         if self.epoch % 10 == 0:
-            print(f"  > Dist Pos (Mean): {dist_positives.mean().item():.4f}")
-            print(f"  > Dist Neg (Mean): {dist_negatives.mean().item():.4f}")
-            print(f"  > Active Constraints: {(log_dist_pos + margin > log_dist_neg).float().mean().item()*100:.1f}%")
-        # Adjust margin for log scale (e.g., margin=1.0 or 2.0)
+            print(f" Dist Pos (Mean): {dist_positives.mean().item():.4f}")
+            print(f" Dist Neg (Mean): {dist_negatives.mean().item():.4f}")
+            print(f" Active Constraints: {(log_dist_pos + margin > log_dist_neg).float().mean().item()*100:.1f}%")
+
         contrastive_loss = torch.relu(margin + log_dist_pos - log_dist_neg).mean()
         kl_loss = -0.5 * torch.sum(1 + torch.log(sigma.pow(2) + self.eps) - mu.pow(2) - sigma.pow(2), dim=1).mean()
 
-        return contrastive_loss + (self.beta * kl_loss)
+        return contrastive_loss + (self.beta*kl_loss)

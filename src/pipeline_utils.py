@@ -6,7 +6,6 @@ from dataset_utils import Graph
 import embeddings
 from embeddings import Embedding
 
-# TODO: hard negative sampling?
 def sample_negative_edges(G: Graph, negative_sample_size: int, excluded_edges: torch.Tensor|None = None) -> Graph:
     """
     Generates negative edges from a graph, which can be given as directed or undirected, weighted or unweighted.

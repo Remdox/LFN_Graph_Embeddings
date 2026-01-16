@@ -32,8 +32,8 @@ If no satisfactory solution is found, DVNE will be restricted only for undirecte
 \begin{itemize}
     \item Node2Vec \cite{Node2VecImpl}
     \item LINE \cite{LINEImpl}: the original implementation was optimized for computational efficiency and training stability (for example, using sparse embeddings, SparseAdam optimizer and Batch Matrix Multiplication). In addition, a linear learning rate decay was 
-    integrated into the training process. At last, the output generation was modified. In fact, the embeddings for first-order and second-order proximity were trained separately, concatenated into a single representation, and then L2-normalized;
-    \item DVNE \cite{DVNEImpl}
+    integrated into the training process. At last, the output generation was modified. In fact, the embeddings for first-order and second-order proximity were trained separately, concatenated into a single representation, and then L2-normalized:
+    \item DVNE \cite{DVNEImpl}: this implementation has been severely rewritten for adapting it to our link prediction pipeline and to make it more similar to the original paper. There are also some changes which resulted in the model being more robust, in particular: the use of log-scaled wasserstein distances, the manual computation of features for the nodes during the training process and using z-score for their standardization. Also a fast approximated method of picking negatives is used for picking the triplets needed in the training process.
     \item GraphSage \cite{GraphSageImpl}: the implementation was modified to support a Graph object as input instead of the original text-based format. In particular, two functions were integrated to generate node features and training labels directly from the graph topology.
     In the end, the training process was adjusted to return the trained model.
 \end{itemize}
@@ -41,7 +41,7 @@ If no satisfactory solution is found, DVNE will be restricted only for undirecte
 classifiers
 \begin{itemize}
     \item SVM
-    \item MLP
+    \item MLP: simple model using just 1 layer with 16 hidden channels, cross entropy loss and Adam optimizer.
     \item RandomForest: for this classifier was used the XGBRFClassifier implementation. This model integrates the Random Forest algorithm within the XGBoost framework, utilizing the histogram-based tree method (hist) to accelerate training on the GPU;
 \end{itemize}
 
