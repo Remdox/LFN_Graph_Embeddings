@@ -1,12 +1,18 @@
-\section{Experimental setting}
+\section{Experiments}
 The link prediction task requires a sample of edges from the graph (positive edges) and a sample of edges from the complement graph (negative edges, in this case, do not include self-loops). 
-Consequently, each dataset will be partitioned as follows.
+Consequently, each dataset is partitioned as follows.
+\\
 Consider graph $G=(V, E)$, where $V$ denotes the set of vertices and $E$ is the set of edges.
 A first split of the set of edges $E$ is needed for the embedding algorithms, creating $E_{\text{embed}}$ and $E_{\text{pred}}$.
+\\
 $E_{\text{embed}}$ is used for the subgraph $G_{\text{embed}}=(V, E_{\text{embed}})$ given as input to the embedding methods:
-the shallow embedding methods will use it to learn a lookup table $Z$ of node embeddings, whereas the deep embedding methods aim to learn a function $f$ that can generalize well. 
+the shallow embedding methods use it to learn a lookup table $Z$ of node embeddings, whereas the deep embedding methods aim to learn a function $f$ that can generalize well. 
+\\
 The remaining edges in $E_{\text{pred}}$ are instead reserved for the link-prediction task, where the second split occurs:
 from $E_{\text{pred}}$ the sets $E_{\text{train}}$, $E_{\text{val}}$, $E_{\text{test}}$ are created for the training, validation and test of the prediction model. 
+More precisely, $E_{\text{train}}$ is used to train the prediction models, $E_{\text{val}}$ to select one of them. 
+After that, the selected model is retrained using both $E_{\text{train}}$ and $E_{\text{val}}$.
+Finally, $E_{\text{test}}$ is used to evaluate its performance.
 \\\newline
 In order to achieve a balanced distribution of negative edges, each set contains an equal number of positive and negative examples. 
 Furthermore, in order to avoid data leakage, the sampled negative edges must be distinct from those used internally by the embedding algorithms during training.
@@ -22,6 +28,12 @@ AUROC is historically considered the primary performance metric used to evaluate
 However, AUROC favors accurate classification of positive examples, at the cost of misclassifying the negative ones. 
 In a scenario like the link prediction problem, which is inherently biased towards the negative class, this approach may not be optimal and can overestimate the performance of the methods. 
 Consequently, the AUPR curve was also selected, as it can provide better evaluation of link prediction in the presence of class imbalance. 
+\\\newline
+The values returned by both metrics range from 0 to 1. 
+The AUROC with a value of 1 is indicative of perfect classification, while 0.5 represents random guesses.
+Similarly, an AUPR value of 1 indicates perfect precision and recall, whereas a value equal to the ratio of positive samples to the total number of samples corresponds to random predictions; in this case, we consider balanced datasets, so the random baseline is 0.5.
+\\\newline
+For the validation phase, the AUROC metric is used to select the best model, while for the final evaluation both AUROC and AUPR are reported.
 
 \subsection{Embedding and classifiers implementation}
 In regard to the implementation of the embedding techniques mentioned in Sec \ref{sec:embedding}, the following implementations will be adopted:  \cite{Node2VecImpl} for Node2Vec, \cite{LINEImpl} for LINE, \cite{DVNEImpl} for DVNE, \cite{GraphSageImpl} for GraphSage. 
@@ -31,10 +43,15 @@ If no satisfactory solution is found, DVNE will be restricted only for undirecte
 
 \begin{itemize}
     \item Node2Vec \cite{Node2VecImpl}
-    \item LINE \cite{LINEImpl}: the original implementation was optimized for computational efficiency and training stability (for example, using sparse embeddings, SparseAdam optimizer and Batch Matrix Multiplication). In addition, a linear learning rate decay was 
-    integrated into the training process. At last, the output generation was modified. In fact, the embeddings for first-order and second-order proximity were trained separately, concatenated into a single representation, and then L2-normalized:
-    \item DVNE \cite{DVNEImpl}: this implementation has been severely rewritten for adapting it to our link prediction pipeline and to make it more similar to the original paper. There are also some changes which resulted in the model being more robust, in particular: the use of log-scaled wasserstein distances, the manual computation of features for the nodes during the training process and using z-score for their standardization. Also a fast approximated method of picking negatives is used for picking the triplets needed in the training process.
-    \item GraphSage \cite{GraphSageImpl}: the implementation was modified to support a Graph object as input instead of the original text-based format. In particular, two functions were integrated to generate node features and training labels directly from the graph topology.
+    \item LINE \cite{LINEImpl}: the original implementation was optimized for computational efficiency and training stability (for example, using sparse embeddings, SparseAdam optimizer and Batch Matrix Multiplication). 
+    In addition, a linear learning rate decay was integrated into the training process. 
+    At last, the output generation was modified. 
+    In fact, the embeddings for first-order and second-order proximity were trained separately, concatenated into a single representation, and then L2-normalized.
+    \item DVNE \cite{DVNEImpl}: this implementation has been severely rewritten for adapting it to our link prediction pipeline and to make it more similar to the original paper.
+    There are also some changes which resulted in the model being more robust, in particular: the use of log-scaled wasserstein distances, the manual computation of features for the nodes during the training process and using z-score for their standardization. 
+    Also a fast approximated method of picking negatives is used for picking the triplets needed in the training process.
+    \item GraphSage \cite{GraphSageImpl}: the implementation was modified to support a Graph object as input instead of the original text-based format. 
+    In particular, two functions were integrated to generate node features and training labels directly from the graph topology.
     In the end, the training process was adjusted to return the trained model.
 \end{itemize}
 
@@ -42,7 +59,8 @@ classifiers
 \begin{itemize}
     \item SVM
     \item MLP: simple model using just 1 layer with 16 hidden channels, cross entropy loss and Adam optimizer.
-    \item RandomForest: for this classifier was used the XGBRFClassifier implementation. This model integrates the Random Forest algorithm within the XGBoost framework, utilizing the histogram-based tree method (hist) to accelerate training on the GPU;
+    \item RandomForest: for this classifier was used the XGBRFClassifier implementation. 
+    This model integrates the Random Forest algorithm within the XGBoost framework, utilizing the histogram-based tree method (hist) to accelerate training on the GPU.
 \end{itemize}
 
 \subsection{Experimental setup}

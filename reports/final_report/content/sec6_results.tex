@@ -9,31 +9,25 @@ indicating a clear community network where links are easily predictable; while f
 (the lowest value of the entire table), likely due to the high noise or sparse connectivity of the graph. \\
 For what concerns classifiers, Random Forest reaches high performance across most embedding techniques and dataset types. Specifically, it is the best performing model for Node2Vec on road networks and for GraphSage in almost
 all scenarios. On the other hand, MLP remains highly effective when paired with DVNE and with Node2Vec on social networks.
-\begin{table}[h]
-\centering
-\renewcommand{\arraystretch}{1.3}
-\makebox[\textwidth][c]{
-    \resizebox{1.2\textwidth}{!}{
-        \begin{tabular}{|m{4cm}|m{1cm}cc|m{1cm}cc|m{1cm}cc|m{1cm}cc|}
-            \hline
-            & \multicolumn{3}{c|}{\textbf{Node2Vec}} & \multicolumn{3}{c|}{\textbf{LINE}} & \multicolumn{3}{c|}{\textbf{DVNE}} & \multicolumn{3}{c|}{\textbf{GraphSage}}\\
-            \cline{2-13}
-            \textbf{Dataset} & Best Model & AUROC & AUPR & Best Model & AUROC & AUPR & Best Model & AUROC & AUPR & Best Model & AUROC & AUPR \\
-            \hline
-            Pennsylvania & RF & 0,8369 & 0,7717 & MLP & 0,5770 & 0,5840 & MLP & 0,7959 & 0,7710 & RF & 0,6958 & 0,6286 \\
-            Padua & RF & 0,8973 & 0,8551 & RF & 0,5805 & 0,5492 & RF & 0,7761 & 0,7121 & RF & 0,8083 & 0,7343 \\
-            Hong Kong & RF & 0,8278 & 0,7649 & MLP & 0,6157 & 0,6219 & MLP & 0,8694 & 0,8464 & RF & 0,8365 & 0,7643 \\
-            Italian Covid-19 Retweet Network & MLP & 0,9596 & 0,9666 & MLP & 0,9513 & 0,9575 & MLP & 0,9716 & 0,9756 & RF & 0,9202 & 0,8808 \\
-            Deezer & MLP & 0,7191 & 0,5652 & RF & 0,5415 & 0,3704 & MLP & 0,6888 & 0,5480 & RF & 0,5769 & 0,3986 \\
-            GitHub Developers & MLP & 0,9225 & 0,8865 & RF & 0,6932 & 0,5578 & MLP & 0,9063 & 0,8540 & MLP & 0,7239 & 0,4947 \\
-            Mus Musculus Protein Interaction & RF & 0,8213 & 0,6877 & RF & 0,7500 & 0,6121 & RF & 0,8091 & 0,6649 & RF & 0,7517 & 0,5762 \\
-            Saccharomyces cerevisiae Protein Interaction & RF & 0,8805 & 0,8130 & RF & 0,8005 & 0,7153 & RF & 0,8601 & 0,7491 & RF & 0,8411 & 0,7177 \\
-            Bio-grid-fission-yeast & MLP & 0,8754 & 0,7962 & MLP & 0,7773 & 0,6829 & RF & 0,8636 & 0,7541 & MLP & 0,8622 & 0,7764 \\
-            \hline
-        \end{tabular}
-    }
-}
+
+\begin{sidewaystable}
+    \centering
+    \begin{tabular}{m{3cm}cccccccccccc}
+        \toprule
+        \multirow{2}{*}{\textbf{Dataset}} & \multicolumn{3}{c}{\textbf{Node2Vec}} & \multicolumn{3}{c}{\textbf{LINE}}  & \multicolumn{3}{c}{\textbf{DVNE}} & \multicolumn{3}{c}{\textbf{GraphSage}} \\
+                                          & Best Model & AUROC & AUPR             & Best Model & AUROC & AUPR          & Best Model & AUROC & AUPR         & Best Model & AUROC & AUPR \\
+        \midrule
+        Pennsylvania & RF & 0,8369 & 0,7717 & MLP & 0,5770 & 0,5840 & MLP & 0,7959 & 0,7710 & RF & 0,6958 & 0,6286 \\
+        Padua & RF & 0,8973 & 0,8551 & RF & 0,5805 & 0,5492 & RF & 0,7761 & 0,7121 & RF & 0,8083 & 0,7343 \\
+        Hong Kong & RF & 0,8278 & 0,7649 & MLP & 0,6157 & 0,6219 & MLP & 0,8694 & 0,8464 & RF & 0,8365 & 0,7643 \\
+        Italian Covid-19 Retweet Network & MLP & 0,9596 & 0,9666 & MLP & 0,9513 & 0,9575 & MLP & 0,9716 & 0,9756 & RF & 0,9202 & 0,8808 \\
+        Deezer & MLP & 0,7191 & 0,5652 & RF & 0,5415 & 0,3704 & MLP & 0,6888 & 0,5480 & RF & 0,5769 & 0,3986 \\
+        GitHub Developers & MLP & 0,9225 & 0,8865 & RF & 0,6932 & 0,5578 & MLP & 0,9063 & 0,8540 & MLP & 0,7239 & 0,4947 \\
+        Mus Musculus Protein Interaction & RF & 0,8213 & 0,6877 & RF & 0,7500 & 0,6121 & RF & 0,8091 & 0,6649 & RF & 0,7517 & 0,5762 \\
+        Saccharomyces cerevisiae Protein Interaction & RF & 0,8805 & 0,8130 & RF & 0,8005 & 0,7153 & RF & 0,8601 & 0,7491 & RF & 0,8411 & 0,7177 \\
+        Bio-grid-fission-yeast & MLP & 0,8754 & 0,7962 & MLP & 0,7773 & 0,6829 & RF & 0,8636 & 0,7541 & MLP & 0,8622 & 0,7764 \\
+        \bottomrule
+    \end{tabular}
 \caption{AUROC and AUPR values for the embedding methods}
 \label{tab:metrics}
-\end{table}
-
+\end{sidewaystable}
