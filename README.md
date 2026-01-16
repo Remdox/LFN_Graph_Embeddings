@@ -21,8 +21,8 @@ Table of Contents
 
 # Introduction
 [Read the first proposal](./reports/first_proposal/first_proposal.pdf).  
-[Read the midterm report](./reports/midterm_report.pdf).  
-[Read the final report](./reports/final_report.pdf).
+[Read the midterm report](./reports/midterm_report/midterm_report.pdf).  
+[Read the final report](./reports/final_report/final_report.pdf).
    
 # Instructions
 ## Requirements
@@ -49,24 +49,24 @@ For the few who have access to the cluster "Blade", a [.def file](./LFN_containe
 * Extract the archive [./datasets/original_dataset.zip](original_dataset.zip) containing the datasets we used.
 * Run [the preprocessing of the datasets](./src/dataset_preprocessing.py):
     ```python
-    python dataset_preprocessing.py
+    python src/dataset_preprocessing.py
     ```
 * Run [the program](./src/embeddings_pipeline.py):
     ```python
-    python embeddings_pipeline.py
+    python src/embeddings_pipeline.py
     ```
    You can also choose to run the pipeline with a single dataset, as well as a single embedding algorithm and a single downstream model. One example:
    ```python
-   python embeddings_pipeline.py --data datasets/processed_datasets/Bio_grid_fission_yeast.csv
+   python src/embeddings_pipeline.py --data datasets/processed_datasets/Bio_grid_fission_yeast.csv
    ```
 
    Or even:
    ```python
-   python embeddings_pipeline.py --data Bio_grid_fission_yeast --embed DVNE --model MLP
+   python src/embeddings_pipeline.py --data Bio_grid_fission_yeast --embed DVNE --model MLP
    ```
    
 # Datasets and project structure
-9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the references for each dataset in the [midterm report](./reports/midterm_report.pdf).
+9 datasets of different sizes are used, ranging from ~25k edges to ~3M edges. You can check the references for each dataset in the [midterm report](./reports/midterm_report/midterm_report.pdf).
 
 ## Datasets full details
 
@@ -93,6 +93,7 @@ LFN_Graph_Embeddings/
 │   └── graphsage/
 │   └── line/
 │   └── node2vec/
+|   └── svm/
 └── reports/
 │   └── final_report/
 │   |   └── final_report.pdf
@@ -124,6 +125,6 @@ See the [final report](./reports/final_report/final_report.pdf).
 # Credits
 We thank the creators of the following implementations (see the [include folder](./include/) inside the project):
 * [Node2Vec](https://github.com/pyg-team/pytorch_geometric);
-* [LINE](https://github.com/tangjianpku/LINE);
+* [LINE](https://github.com/dmpierre/LINE);
 * [Deep Variational Network Embedding in Wasserstein Space](https://github.com/Lakshya-99/Deep_Variational_Network_Embedding/tree/master);
 * [GraphSage](https://github.com/williamleif/GraphSAGE).
