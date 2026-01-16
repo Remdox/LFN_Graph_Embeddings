@@ -29,7 +29,7 @@ class Node2Vec(Embedding):
         self.device = device
 
     def train_embed(self, graph):
-        self.model = run_data_node2vec(graph.graph_data)
+        self.model = run_data_node2vec(graph.graph_data).to(self.device)
         return self.model
 
     def get_node_embedding(self, node_id):
@@ -56,7 +56,7 @@ class Node2Vec(Embedding):
         with torch.no_grad():
             for i in range(0, num_nodes, batch_size):
                 batch_indices = all_node_indices[i : i + batch_size]
-                batch_emb = self.model.embedding(batch_indices)
+                batch_emb = self.model.embedding(batch_indices).to(self.device)
                 batched_embs.append(batch_emb.cpu())
 
         self.embedding_matrix = torch.cat(batched_embs, dim=0).to(self.device)

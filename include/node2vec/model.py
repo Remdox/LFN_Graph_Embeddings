@@ -16,6 +16,7 @@ def run_data(graph: Data, patience:int =20) -> Node2Vec:
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = Node2Vec(
                         edge_index=graph.edge_index,
+                        num_nodes=graph.num_nodes,
                         embedding_dim=128,
                         walk_length=20,
                         context_size=10,
@@ -52,6 +53,5 @@ def run_data(graph: Data, patience:int =20) -> Node2Vec:
         if epochs_wout_improvement >= patience:
             print(f"Early stopping at epoch {epoch}")
             break
-    print("ss")
     
     return model

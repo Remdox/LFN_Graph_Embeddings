@@ -88,6 +88,10 @@ def split_graph_data(G: Graph, val_ratio: float, test_ratio: float) -> tuple[Gra
     val_split   = create_split(G, val_edges)
     test_split  = create_split(G, test_edges)
 
+    train_split.graph_data.num_nodes = G.graph_data.num_nodes
+    val_split.graph_data.num_nodes   = G.graph_data.num_nodes
+    test_split.graph_data.num_nodes  = G.graph_data.num_nodes
+
     return (train_split, val_split, test_split)
 
 # Data contains a key-value dictionary called store, which collects all tensors
@@ -192,6 +196,7 @@ def merge_negative_edges(G_pos: Graph, G_neg: Graph):
     shuffled_edge_labels = merged_labels[perm]
 
     merged_graph = Graph(merged_data, G_pos.is_directed, G_pos.is_weighted)
+    merged_graph.graph_data.num_nodes = G_pos.graph_data.num_nodes
 
     return (merged_graph, shuffled_edge_labels)
 

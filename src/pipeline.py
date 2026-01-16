@@ -89,6 +89,7 @@ def main(data, embed, model):
 
         # train, test, validation split
         G_train, G_val, G_test = split_graph_data(G_pred, val_ratio=0.2, test_ratio=0.2)
+        G_train.graph_data.num_nodes = G_pred.graph_data.num_nodes
         print("---- train, val, test split ----")
         print(G_train.graph_data, G_val.graph_data, G_test.graph_data)
 
